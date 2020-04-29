@@ -1,0 +1,200 @@
+<template>
+    <div>
+
+    
+ <!-- Expressions -->
+<Grammar>
+12.3 Left-Hand-Side Expressions
+<!-- Tree VS Priority -->
+    树 & 优先级
+    ·+ -
+    ·*/
+    ·()
+    1+2*3
+
+<!-- ·Member  -->
+
+    ·a*b
+    ·a[b]
+    ·foo`string`
+    ·super.b
+    ·super['b']
+    ·new.target
+    ·new Foo()
+
+·new
+    ·new foo 
+
+Example:
+    new a()
+    new new a()
+
+
+<!-- ·Reference -->
+    object
+    key
+    
+    delete
+    assign
+<!-- Call -->
+    ·foo()
+    ·super()
+    ·foo()['b']
+    ·foo().b
+    ·foo()`abc`
+
+    Example:
+        new a()['b']
+
+<!-- Left Handside & Right Handside -->
+    a.b = c
+    a+b = c
+
+    右优先
+    a++
+
+<!-- update -->
+    a++
+    a--
+    --a
+    ++a
+
+    Example:
+        ++a++
+        +++(a++)
+<!-- Unary 单目运算-->
+    delete a.b 
+    void function
+    typeof a
+    +a
+    -a 
+    ~a 取反
+    !a  =>  !!1  //true
+    await a 
+
+<!-- Exponental -->
+    ** 
+    唯一一个右结合的
+
+<!-- mul -->
+    * / %
+
+<!-- add  -->
+    + -
+
+<!-- shift -->
+<< >> >>>
+
+<!-- relationship -->
+<> <= >= instanceof in
+
+<!-- Equality -->
+==
+!=
+===
+!==
+
+<!-- bitwise -->
+& ^ |
+
+<!-- 逻辑运算Logical -->
+|| && 
+
+&& 是短路逻辑
+|| 左右两边都会先计算出来
+
+<!-- 三目运算 Conditional -->
+? :
+
+,逗号?
+
+JavaScript 
+两种加法
+一种乘法
+
+
+<!-- 类型转换 表-->
+
+<!-- 装箱Boxing 拆箱Unboxing -->
+    <!-- 装箱 -->
+    四种基本类型(Number、String、Boolean、symbol)都有对应的class
+
+    new Number("1")
+    new String("2") != string('2')  //用typeof来区分
+    new Boolean('true')
+    symbol(1)  symbol 不存在new不new的问题
+
+    new 一个对应的class 就是装箱
+    <!-- 拆箱 -->
+    symbol.toPrimitve => 决定优先调用valueof 还是 toString
+
+    new Date。toJson() 会转成数字
+
+    <!-- 练习 -->
+    StringToNumber
+        parseFloat
+        Number
+        1231
+
+    NumberToString
+
+
+<runtime>   
+</div>
+</template>
+<script>
+    var name = "Miss zhang"
+    console.log(`Hello ${name}`)
+
+    function foo(){
+        console.log(arguments)
+    }
+    foo`Hello ${name}!`
+    // 观察返回的数组 一组是由空格符切割开的字符串,一组是变量
+
+    function class1(s){
+        console.log(s)
+    }
+    function class2(s){
+        console.log('2',s)
+        return class1(s)
+    }
+    
+    // new (class2("good"))==
+    // new (new class2("good"))==
+    // new new class2("good")
+
+
+    for(var i=0;i < 10; i++){
+        var button = document.createElement("button")
+
+        document.body.appendChild(button)
+        button.innerHTML = i;
+        console.log(button)
+        // 立即执行的函数表达式
+        (function(i){
+            button.onclick = function(){
+                console.log(i)
+            }
+        })(i)
+    }
+
+    for(var i=0;i < 10; i++){
+        var button = document.createElement("button")
+
+        document.body.appendChild(button)
+        button.innerHTML = i;
+        console.log(button)
+        // 推荐使用viod 避免语法错误
+        void function(i){
+            button.onclick = function(){
+                console.log(i)
+            }
+        }(i)
+    }
+
+    typeof null //"object"
+    typeof function(){} //"function"
+
+</script>
+

@@ -1,0 +1,75 @@
+<!-- <html>
+    <head></head>
+    <body>
+        <div class="number">
+            number: <input class="number" />
+           <button class="check" click="">确定</button>
+        </div>
+        toString:<div class="toString"></div>
+        <div class="String">
+            String: <input class="text" />
+           
+        </div>
+        toNumber:<div class="toNumber"></div>
+    </body> -->
+    <script>
+        function StringToNumber(string, x){
+            if(arguments.length < 2){
+                x = 10; //默认十进制
+            }
+            // 四个进制、科学计数法
+            var chars = string.split('');
+            var number = 0;
+            var i = 0;
+            
+            while(i <chars.length && chars[i] != '.'){
+                number = number * x;
+                number += chars[i].codePointAt(0) - '0'.codePointAt(0)
+                i++;
+            }
+
+            if(chars[i] === "."){
+                i++;
+            }
+
+            var fraction = 1; //表示数字的位置
+            while(i < chars.length){
+                console.log(fraction)
+                fraction = fraction / x;
+                // '0'.codePointAt(0) = 48
+                number += (chars[i].codePointAt(0) - '0'.codePointAt(0)) * fraction;
+                
+                i++;
+            }
+            console.log(number)
+            return number;
+            
+        }
+
+        function NumberToString(number, x){
+            var integer = Math.floor(number);
+            var fraction = number - integer;
+            var string = '';
+
+            while(integer > 0){
+                string = String(integer % x) + string;
+                integer = Math.floor(integer / x);
+            }
+
+            if(fraction)
+            if(number[i] === "."){
+                i++;
+            }
+            console.log(string)
+            return string;
+            
+        }
+
+        StringToNumber("10.023771")
+        StringToNumber("23771",8)
+        // StringToNumber("42EF",16)
+        StringToNumber("00100101",2)
+
+        NumberToString(21312.03,10)
+    </script>
+<!-- </html> -->

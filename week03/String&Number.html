@@ -1,75 +1,119 @@
-<!-- <html>
-    <head></head>
-    <body>
-        <div class="number">
-            number: <input class="number" />
-           <button class="check" click="">确定</button>
-        </div>
-        toString:<div class="toString"></div>
-        <div class="String">
-            String: <input class="text" />
-           
-        </div>
-        toNumber:<div class="toNumber"></div>
-    </body> -->
-    <script>
-        function StringToNumber(string, x){
-            if(arguments.length < 2){
-                x = 10; //默认十进制
-            }
-            // 四个进制、科学计数法
-            var chars = string.split('');
-            var number = 0;
-            var i = 0;
-            
-            while(i <chars.length && chars[i] != '.'){
-                number = number * x;
+<script>
+    function StringToNumber(string, x) {
+        if (arguments.length < 2) {
+            x = 10; //默认十进制
+        }
+
+        var chars = string.split('');
+        var number = 0;
+        var i = 0;
+        console.log(chars)
+
+
+        // 12345.023771
+        // 整数位
+        while (i < chars.length && chars[i] != '.') {
+            number = number * x;
+            // A-F
+            if (x == 16 && chars[i].codePointAt(0) > '9'.codePointAt(0)) {
+                number += 10 + chars[i].codePointAt(0) - 'A'.codePointAt(0)
+            } else {
                 number += chars[i].codePointAt(0) - '0'.codePointAt(0)
-                i++;
             }
+            i++;
+        }
 
-            if(chars[i] === "."){
-                i++;
-            }
-
-            var fraction = 1; //表示数字的位置
-            while(i < chars.length){
-                console.log(fraction)
-                fraction = fraction / x;
-                // '0'.codePointAt(0) = 48
+        // 浮点数的小数点
+        if (chars[i] === ".") {
+            i++;
+        }
+        // 小数位
+        var fraction = 1;
+        while (i < chars.length) {
+            // console.log(fraction)
+            fraction = fraction / x;
+            
+            if ((chars[i] == 'E' || chars[i] == 'e' )&& x == 10) {
+                let scientific = 0;
+                if(chars[i] == 'E')
+                    scientific = string.split('E')[1];
+                else
+                    scientific = string.split('e')[1];
+               
+                for (var j = 0; j < scientific; j++) {
+                    number *= 10
+                }
+                console.log(number)
+                return number
+            } else {
                 number += (chars[i].codePointAt(0) - '0'.codePointAt(0)) * fraction;
-                
-                i++;
             }
-            console.log(number)
-            return number;
-            
+            i++;
+        }
+        console.log(number)
+        return number;
+
+    }
+
+    
+    function NumberToString(number, x) {
+        // console.log(typeof(number))
+
+        // console.log(String(number))
+        // console.log(typeof(String(number)))
+        var integer = Math.floor(number); //整数部分
+        var fraction = number - integer; //小数部分
+        var string = '';
+        
+
+        // 整数部分处理
+        while (integer > 0) {
+            string = String(integer % x) + string;
+            integer = Math.floor(integer / x);
         }
 
-        function NumberToString(number, x){
-            var integer = Math.floor(number);
-            var fraction = number - integer;
-            var string = '';
-
-            while(integer > 0){
-                string = String(integer % x) + string;
-                integer = Math.floor(integer / x);
-            }
-
-            if(fraction)
-            if(number[i] === "."){
-                i++;
-            }
-            console.log(string)
-            return string;
-            
+        // 有小数部分
+        if(String(fraction).length > 0){
+            string += '.'
         }
 
-        StringToNumber("10.023771")
-        StringToNumber("23771",8)
-        // StringToNumber("42EF",16)
-        StringToNumber("00100101",2)
+        // 小数部分处理
+        console.log(fraction)
+        let index = 1;
+        // while (String(fraction).length > 0) {
+        //     string = String(integer * x) + string;
+        //     integer = Math.floor(integer / x);
+        // }
+        
 
-        NumberToString(21312.03,10)
-    </script>
-<!-- </html> -->
+        console.log(string)
+        return string;
+
+    }
+
+
+
+    // 四个进制、科学计数法
+    //  正负？
+    // StringToNumber("12345")
+    // StringToNumber("12345.023771")
+    // StringToNumber("23771",8)
+    // StringToNumber("23771.231",8)
+    // StringToNumber("42EF",16)
+    // StringToNumber("42EF.EF",16)
+    // StringToNumber("42EF.0012",16)
+    // StringToNumber("00100101",2)
+    // StringToNumber("10100101.00100101",2)
+    // StringToNumber("2.4678e6", 10)
+
+    // NumberToString(12345)
+    NumberToString(12345.023771)
+    // NumberToString(23771,8)
+    // NumberToString(23771.231,8)
+    // NumberToString(42EF,16)
+    // NumberToString(42EF.EF,16)
+    // NumberToString(42EF.0012,16)
+    // NumberToString(00100101,2)
+    // NumberToString(10100101.00100101,2)
+    // NumberToString(2.4678e6, 10)
+</script>

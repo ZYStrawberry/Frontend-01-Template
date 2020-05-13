@@ -93,6 +93,20 @@ class ResponseParser{
     this.bodyParser = null;
 
   }
+   
+  get isFinished(){
+      return this.bodyParser && this.bodyParser.isFinished
+  }
+
+  get response(){
+      this.statusLine.match(/HTTP\/1.1 ([0-9]+) ([\s\S]+)/)
+      return {
+          statusCode:RegExp.$1,
+          statusText:RegExp.$2,
+          headers:this.headers,
+          body:this.bodyParser.conetent.join('')
+      }
+  }
 
   receive(string){
       for(let i = 0;i < string.length; i++){
@@ -187,26 +201,6 @@ class TrunkedBodyParser {
       this.isFinished = false;
       this.current = this.WAITING_LENGTH
 
-  }
-
-  get isFinished(){
-      return bodyParser && this.bodyParser.isFinished
-  }
-
-  get response(){
-      this.statusLine.match(/HTTP\/1.1 ([0-9]+) ([\s\S]+)/)
-      return {
-          statusCode:RegExp.$1,
-          statusText:RegExp.$2,
-          headers:this.headers,
-          body:this.bodyParser.conetent.join('')
-      }
-  }
-
-  receive(string){
-      for(let i = 0;i < string.length; i++){
-          this.receiveChar(string.charAt(i))
-      }
   }
 
   receiveChar(char){

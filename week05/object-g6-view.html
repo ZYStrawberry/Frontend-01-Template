@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Tutorial Demo</title>
+    <style>
+        /* 提示框的样式 */
+        .g6-tooltip {
+            border: 1px solid #e2e2e2;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #545454;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 8px;
+            box-shadow: rgb(174, 174, 174) 0px 0px 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mountNode"></div>
+
+    <script src="https://gw.alipayobjects.com/os/antv/pkg/_antv.g6-3.1.0/build/g6.js"></script>
+    <script src="./json.js"></script>
+    <script>
+        const graph = new G6.Graph({
+            container: 'mountNode',
+            width: 800,
+            height: 600,
+            defaultNode: {
+                labelCfg: {
+                    style: {
+                        fill: '#fff'
+                    }
+                }
+            },
+            // 边在默认状态下的样式配置（style）和其他配置
+            defaultEdge: {
+                // ...                 // 边的其他配置
+                // 边样式配置
+                style: {
+                    opacity: 0.6, // 边透明度
+                    stroke: 'grey', // 边描边颜色
+                },
+                // 边上的标签文本配置
+                labelCfg: {
+                    autoRotate: true, // 边上的标签文本根据边的方向旋转
+                },
+            },
+            nodeStateStyles: {
+                hover: {
+                    fill: 'lightsteelblue'
+                },
+                click: {
+                    stroke: '#000',
+                    lineWidth: 3
+                }
+            },
+            edgeStateStyles: {
+                click: {
+                    stroke: 'steelblue'
+                }
+            },
+            layout: {
+                type: 'radial',
+                center: [ 200, 200 ],     // 可选，默认为图的中心
+                linkDistance: 50,         // 可选，边长
+                maxIteration: 1000,       // 可选
+                focusNode: 'node11',      // 可选
+                unitRadius: 100,          // 可选
+                preventOverlap: true,     // 可选，必须配合 nodeSize
+                nodeSize: 300,             // 可选
+                strictRadial: false,      // 可选
+                workerEnabled: true       // 可选，开启 web-worker
+            },
+            modes: {
+                default: ['drag-node', 'drag-canvas', 'zoom-canvas',
+                    // 点提示框交互工具的配置
+                    {
+                        type: 'tooltip',
+                        formatText(model) {
+                            const text = 'label: ' + model.label +
+                                '<br/> class: ' + model.class;
+                            return text;
+                        },
+                        shouldUpdate: e => {
+                            return true;
+                        }
+                    },
+                    // 边提示框交互工具的配置
+                    {
+                        type: 'edge-tooltip',
+                        formatText(model) {
+                            const text = 'source: ' + model.source +
+                                '<br/> target: ' + model.target +
+                                '<br/> weight: ' + model.weight;
+                            return text;
+                        },
+                        shouldUpdate: e => {
+                            return true;
+                        }
+                    }
+                ]
+            }
+        });
+
+
+
+  
+        const nodes = data.nodes;
+        nodes.forEach(node => {
+            if (!node.style) {
+                node.style = {};
+            }
+            node.style.lineWidth = 1;
+            node.style.stroke = '#666';
+            node.style.fill = 'steelblue';
+            switch (node.class) {
+                case 'c0': {
+                    node.shape = 'rect';
+                    node.size = [80, 20];
+                    node.style.fill = '#F47378';
+                    break;
+                }
+                case 'c1': {
+                    node.shape = 'rect';
+                    node.size = [80, 20];
+                    node.style.fill = '#00B050';
+
+                    break;
+                }
+                case 'c1-1': {
+                    node.shape = 'rect';
+                    node.size = [80, 20];
+                    node.style.fill = '#00B050';
+
+                    break;
+                }
+                case 'c2': {
+                    node.shape = 'rect';
+                    node.size = [80, 20];
+                    node.style.fill = '#60C5F1';
+                    break;
+                }
+                case 'c2-1': {
+                    node.shape = 'rect';
+                    node.size = [80, 20];
+                    node.style.fill = '#60C5F1';
+                    break;
+                }
+                case 'c3': {
+                    node.shape = 'rect';
+                    node.size = [80, 20];
+                    node.style.fill = '#D150D3';
+                    break;
+                }
+                case 'c3-1': {
+                    node.shape = 'rect';
+                    node.size = [80, 20];
+                    node.style.fill = '#D150D3';
+                    break;
+                }
+                case 'c4': {
+                    node.shape = 'rect';
+                    node.size = [80, 20];
+                    node.style.fill = '#EF7724';
+                    break;
+                }
+                case 'c4-1': {
+                    node.shape = 'rect';
+                    node.size = [80, 20];
+                    node.style.fill = '#EF7724';
+                    break;
+                }
+            }
+        });
+
+
+
+        graph.data(data);
+        graph.render();
+
+        graph.on('node:mouseenter', e => {
+            const nodeItem = e.item;
+            graph.setItemState(nodeItem, 'hover', true);
+        });
+        graph.on('node:mouseleave', e => {
+            const nodeItem = e.item;
+            graph.setItemState(nodeItem, 'hover', false);
+        });
+        graph.on('node:click', e => {
+            const clickNodes = graph.findAllByState('node', 'click');
+            clickNodes.forEach(cn => {
+                graph.setItemState(cn, 'click', false);
+            });
+            const nodeItem = e.item;
+            graph.setItemState(nodeItem, 'click', true);
+        });
+        graph.on('edge:click', e => {
+            const clickEdges = graph.findAllByState('edge', 'click');
+            clickEdges.forEach(ce => {
+                graph.setItemState(ce, 'click', false);
+            });
+            const edgeItem = e.item;
+            graph.setItemState(edgeItem, 'click', true);
+        });
+    </script>
+</body>
+
+</html>

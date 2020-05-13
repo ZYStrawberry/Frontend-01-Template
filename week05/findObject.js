@@ -52,6 +52,8 @@ var globalProperties = [
     let current;
     let queue = [];
     for(let p of globalProperties){
+        //console.log([p])
+        //console.log(this[p])
         queue.push({
             path:[p],
             object:this[p]
@@ -66,11 +68,10 @@ var globalProperties = [
         // console.log(current)
 
         for(let p of Object.getOwnPropertyNames(current.object)){
+            
             var property = Object.getOwnPropertyDescriptor(current.object, p)
-
-            if(property.hasOwnProperty("value") && 
-            ( (property.value != null) && (typeof property.value == 'object') || (typeof property.value == 'object')) 
-            && property.value instanceof Object){
+			//console.log(property)
+            if(property.hasOwnProperty("value") && (property.value != null) && (typeof property.value == 'object') || (typeof property.value == 'function')) {
                 queue.push({
                     path:current.path.concat([p]),
                     object:property.value
@@ -93,3 +94,5 @@ var globalProperties = [
             
         }
     }
+
+console.log(set)

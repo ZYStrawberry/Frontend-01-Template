@@ -17,9 +17,9 @@
   3. TCP与IP的基础知识：流、包、端口、IP地址、require（'net')、libnet/libpcap
   4. node.js中的HTTP 
   参考链接：
-  · https://nodejs.org/dist/latest-v12.x/docs/api/http.html
-  · https://nodejs.org/dist/latest-v12.x/docs/api/net.html
-  · HTTP/1.1标准文档：https://tools.ietf.org/html/rfc2616
+  - https://nodejs.org/dist/latest-v12.x/docs/api/http.html
+  - https://nodejs.org/dist/latest-v12.x/docs/api/net.html
+  - HTTP/1.1标准文档：https://tools.ietf.org/html/rfc2616
   
   
   

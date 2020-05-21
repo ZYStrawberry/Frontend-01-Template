@@ -398,6 +398,6 @@ module.exports.parseHTML = function parseHTML(html){
     for(let c of html){
     	state = state(c);
     }
-    state = start(EOF)
+    state = state(EOF)
     console.log(stack[0])
 }

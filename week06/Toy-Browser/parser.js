@@ -345,7 +345,7 @@ function selfClosingStartTag(c){
         currentToken.isSelfClosing = true;
         emit(currentToken)
         return data;
-    } else if(c == "EOF"){
+    } else if(c == EOF){
     	
     } else {
     

@@ -2,7 +2,7 @@
 
 
 
-#布局方式：flex
+# 布局方式：flex
 
 ## 第一步 预处理
 - 搞清楚主轴和交叉轴
@@ -27,7 +27,7 @@ var mainSize,mianStart, mainEnd, mainSign, mainBase,
 
 
 
-#绘制
+# 绘制
 
 ## 绘制单个元素
 - 绘制需要依赖一个图形环境

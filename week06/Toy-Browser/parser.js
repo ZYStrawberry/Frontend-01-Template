@@ -1,127 +1,143 @@
+const EOF = Symbol("EOF")
 let currentToken = null;
 let currentAttribute = null;
-let stack = [{
-    type:"document",
-    children:[]
-}];
-let currentTextNode = null; //文本节点
-const css = require("css");  //引用css包
 
-//加入一个新的函数，addCSSRules
-//这里我们把css规则暂存到一个数组里
+let stack = [{
+    type:'documnet',
+    children:[]
+}]
+let currentTextNode= null;
+// const layout = require("./layout.js")
+
 let rules = [];
+const css = require("css")
 function addCSSRules(text){
-	var ast = css.parse(text); // 返回一个ast
-    console.log(JSON.stringify(ast, null,  "   "));
-    rules.push(...ast.stylesheet.rules);
-               
+    var ast = css.parse(text);
+    // console.log(JSON.stringify(ast, null, "    "));
+    rules.push(...ast.stylesheet.rules)
 }
 
+// 匹配 三种选择器
 function match(element, selector){
-    if(!selector || !element.attributes){
+    console.log(element,selector);
+    if(selector || element.attributes)
         return false;
-    }
     if(selector.charAt(0) == "#"){
-        var attr = element.attributes.filter(attr => attr.name === "id")[0]
-        if(attr && attr.value === selector.replace("#","")){
+        var attr = element.attributes.filter(attr => attr.name === "id")[0];
+        if(attr && attr.value === selector.replace("#",""))
             return true;
-        }else if(selector.charAt(0) == "."){
-            var attr = element.attributes.filter(attr => attr.name === "id")[0]
-            if(attr && attr.value === selector.replace(".","")){
-                return true;
-            }
-        }else{
-            if(element.tagName === selector){
-                return true;
-            }
+    } else if(selector.charAt(0) === "."){
+        var attr = element.attributes.filter(attr => attr.name === "class")[0];
+        if(attr && attr.value === selector.replace(".",""))
+            return true;
+    } else {
+        if(element.tagName === selector){
+            return true;
         }
     }
+    return false;
 }
 
+// 获取优先级数组 数组最右边优先级越高
+// [标签,calss,id,in-line-style]
 function specificity(selector){
-    var p = [0,0,0,0];
+    var p = [0,0,0,0]
     var selectorParts = selector.split(" ");
     for(var part of selectorParts){
-        if(part.charAt(0) == "#"){
+        if(part.charAt(0) === "#"){
             p[1] += 1;
-        }else if(part.charAt(0) == "."){
+        }else if(part.charAt(0) === "."){
             p[2] += 1;
-        }else {
+        } else {
             p[3] += 1;
         }
     }
     return p;
 }
 
+// 比较优先级大小
 function compare(sp1,sp2){
     if(sp1[0] - sp2[0]){
         return sp1[0] - sp2[0]
     }
-
     if(sp1[1] - sp2[1]){
-        return sp1[1] - sp2[1]
+        return sp1[1] - sp2[2]
     }
-
     if(sp1[2] - sp2[2]){
         return sp1[2] - sp2[2]
     }
-
     return sp1[3] - sp2[3]
 }
 
-function computeCSS(){
-    var element = stack.slice().reverse();
+function computedCSS(element){
+    // stack.slice() 相当于copy了一份当前的stack
+    // elements 是全部的父元素
+    var elements = stack.slice().reverse()
+    
     if(!element.computedStyle){
-        element.computedStyle = {};
+        element.computedStyle = {}
     }
-    let matchd = false;
+
+    // 对elements 和 rules 一起遍历，匹配
     for(let rule of rules){
-        var selectorParts = rule.selector[0].split(" ").reverse();
+        // rule.selectors: ["body div #myid"]
+        // 这里只处理了空格的复合选择器
+        var selectorParts = rule.selectors[0].split(' ').reverse(); // #myid div body
+        // selectorParts[0]:#myid 首先获得的是"当前元素"
         if(!match(element,selectorParts[0]))
-            continue;
+            continue
+        let matched = false;
         var j = 1;
-        for(var i = 0; i < customElements.length;i++){
+        for(var i = 0;i < elements.length; i++){
             if(match(elements[i],selectorParts[j])){
                 j++;
             }
         }
+        
         if(j >= selectorParts.length){
-            matchd = true
+            matched = true;
         }
-        if(matchd){
-            var sp = specificity(rule.selectors[0]);
+
+        if(matched){
+            //如果匹配到，我们要加入
+            console.log("Element", element, "matched rule", rule);
+            // var sp = specificity(rule.selectors[0]);
             var computedStyle = element.computedStyle;
-            for(var declaration of rul.declarations){
-                if(!computedStyle[declaration.prperty])
-                    computedStyle[declaration.prperty] = {}
-                if(!computedStyle[declaration.prperty].specificity){
-                    computedStyle[declaration.prperty].value = declaration.value
-                    computedStyle[declaration.prperty].value = declaration.sp
+            for(var declaration of rule.declarations){
+                if(!computedStyle[declaration.property])
+                    computedStyle[declaration.property] = {}
+                if(!computedStyle[declaration.property].specificity){
+                    computedStyle[declaration.property].value = declaration.value
+                    computedStyle[declaration.property].value = declaration.sp
                 } else if(compare(computedStyle[declaration.property].specificity, sp) < 0){
+                    computedStyle[declaration.property].value = declaration.value
                     computedStyle[declaration.property].specificity = sp;
                 }   
             }
         }
+
     }
 }
 
 function emit(token){
-    //if(token.type === "text"){
-        //return;
-    //}
-    let top = stack[stack.length - 1];
+    console.log("emit:"+ token)
+    
+    let top = stack[stack.length-1];  // 栈顶
+
     if(token.type == "startTag"){
+        // 遇到开始标签时创建元素并入栈
         let element = {
-            type:"element",
+            type:'element',
             children:[],
-            attributes:[]
-        };
+            attributes:[],
+            // tagName:null
+        }
 
         element.tagName = token.tagName;
 
         for(let p in token){
-            if(p != "type" && p != "tagName"){
-                //maaa a
+            if(p != "type" && p != "tagName"){ 
+                // 排除type和tagName,剩下属性token,存到元素的属性中
                 element.attributes.push({
                     name:p,
                     value:token[p]
@@ -129,260 +145,124 @@ function emit(token){
             }
         }
 
-        computeCSS(element);
+        computedCSS(element)
+    
+        top.children.push(element)
+        element.parent = top;
 
-        top.children.push(element);
-        //element.parent = top;  //新加子元素的栈顶
-        
         if(!token.isSelfClosing){
-            stack.push(element);
+            stack.push(element)
         }
         currentTextNode = null;
-    } else if(token.type == "endTag"){
+
+    }else if(token.type == "endTag"){
         if(top.tagName != token.tagName){
-            throw new Error("Tag start end doesn't match!");
+            throw new Error("tag start end doesn't match!")
         } else {
-            // 匹配上结束标签 就可以出栈
-            if(top,tagName === "style"){
+            // ++++++++++当遇到style结束标签时，执行添加css规则的操作 ++++++++
+            if(top.tagName === "style"){
+                //top.children[0].content 是css部分的内容
                 addCSSRules(top.children[0].content)
             }
-            stack.pop();
+            // layout(top)
+
+            // 遇到结束标签是时出栈
+            stack.pop()
         }
         currentTextNode = null;
-    } else if(token.type == "text"){
 
+    }  else if(token.type == "text"){
+        // console.log(token)
         if(currentTextNode == null){
-            // 没有文本节点，直接新建一个文本节点
-           currentTextNode = {
-               type:'text',
-               content:''
-           }
-           top.children.push(currentTextNode);
+
+            currentTextNode = {
+                type: "text",
+                content: ""
+            }
+
+            top.children.push(currentTextNode)
         }
+        // console.log(token.content)
         currentTextNode.content += token.content;
     }
+
 }
 
-const EOF = Symbol("EOF"); //EOF: End Of File
-
-function data (c){
-    //三种标签：开始<，结束EOF，自封闭
-	if(c == "<"){
-  		return tagOpen;
-    } else if(c == EOF){
+function data(c){
+     //三种标签：开始<，结束EOF，自封闭
+    if(c === "<"){
+        //开始标签
+        return tagOpen;
+    } 
+    // else if(c === "&"){
+    //     return ;
+    // } 
+    else if(c === EOF){
+        // Emit an end-of-file token. 提交一个结束标识
         emit({
             type:"EOF"
-        });
-     	return ;
+        })
+        return ;
     } else{
+        // Emit the current input character as a character token.
         emit({
             type:"text",
             content:c
-        });
-    	return data;
-	}
+        })
+        return data;
+    }
 }
 
 function tagOpen(c){
-	if(c == "/"){ //结束标志
-    	return endTagOpen;
-    } else if (c.match(/^[a-zA-Z]$/)){ //继续
+    if(c === "/"){
+        //结束标签
+        return endTagOpen;
+    } else if(c.match(/^[a-zA-Z]$/)){
+        //标签名
+        //新建一个 token 暂且认为是开始标签
         currentToken = {
             type:"startTag",
             tagName:""
         }
-		return tagName(c);
+        return tagName(c) // Reconsume 传入c 直接去下一步处理
     } else {
         emit({
             type:"text",
             content:c
-        });
-    	return ;
-    }      
+        })
+        return;
+    }
 }
-
-
 
 function tagName(c){
-	if(c.match(/^[\t\n\f ]$/)){
-    	return beforeAttributeName;
-    } else if(c == "/"){
-    	return selfClosingStartTag;
-    } else if(c.match(/^[a-zA-Z]$/)){
-        currentToken.tagName += c;
-    	return tagName;
-    } else if(c == ">"){
-        emit(currentToken);
-    	return data;
-    } else {
-        currentToken.tagName += c;
-    	return tagName;
-    }
-}
-
-function beforeAttributeName(c){
-	if(c.match(/^[\t\n\f ]$/)){ // 空格
-    	return beforeAttributeName;
-    } else if(c == ">" || c == "/" || c == EOF){
-    	return afterAttributeName(c)
-    } else if(c == "="){
-    	//抛错
-    } else {
-        // 普通字符 是属性名
-    	currentAttribute = {
-            name:'',
-            value:''
-        }
-
-        return attributeName(c)
-    }
-}
-
-function  attributeName(c){
-    if(c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF){
-    	return afterAttributeName(c);
-    }  else if(c == "="){
-        // 已经获取到属性名 去获取属性值
-    	return beforeAttributeName;
-    	
-    } else if(c == "\u0000"){
-    	
-    }else if(c == "\"" || c == "'" || c == "<"){
-    	
-    }else {
-        // 不是特殊字符，就追加到属性名上
-        currentAttribute.name += c;
-        return attributeName;
-    }
-}
-
-function beforeAttributeValue(c){
-    if(c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF){
-    	return beforeAttributeValue;
-    }  else if(c == "\""){
-    	return doubleQuotedAttributeValue;
-    }else if(c == "\'"){
-    	return singleQuotedAttributeValue
-    }else if( c == ">"){
-        return data;
-    } else {
-       	// 获取属性值
-        return UnquotedAttributeValue(c);
-    }
-}
-
-function doubleQuotedAttributeValue(c){
-    if(c == "\""){
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        return afterQuotedAttributeValue;
-    } else if(c == "\u0000"){
-
-    } else if(c == EOF){
-
-    } else {
-        currentAttribute.value += c;
-        return doubleQuotedAttributeValue
-    }
-}
-
-function singleQuotedAttributeValue(c){
-    if(c == "\""){
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        return afterQuotedAttributeValue;
-    } else if(c == "\u0000"){
-
-    } else if(c == EOF){
-
-    } else {
-        currentAttribute.value += c;
-        return doubleQuotedAttributeValue
-    }
-}
-
-function afterQuotedAttributeValue(c){
-    if(c.match(/^[\t\n\f ]$/)){
-    	return beforeAttributeName;
-    } else if(c == "/"){
-    	return selfClosingStartTag;
-    } else if(c == ">"){
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        emit(currentToken)
-        return data;
-    } else if(c == EOF){
-
-    } else {
-        currentAttribute.value += c;
-        return doubleQuotedAttributeValue
-    }
-}
-
-function UnquotedAttributeValue(c){
-    // maaa=a中的最后一个a进来了
-    if(c.match(/^[\t\n\f ]$/)){
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        return beforeAttributeName;
-    } else if(c == "/"){
-        currentToken[currentAttribute.name] = currentAttribute.value;
+    if(c.match(/^[\t\n\f ]$/)){          // 制表符、换行符、换页符、空格
+        return beforeAttributeName;    //处理属性 
+    } else if(c.match(/^[a-zA-Z]$/)){   // 匹配上字母，还是标签名的一部分
+        currentToken.tagName += c
+        // .toLowerCase();
+        return tagName;
+    } else if( c === "/"){              // 自封闭标签
         return selfClosingStartTag;
-    } else if(c == ">"){
-        currentToken[currentAttribute.name] = currentAttribute.value;
+    } else if(c === ">"){               // 获取到了标签名
         emit(currentToken)
         return data;
-    } else if( c== "\u0000"){
-
-    } else if(c == "\"" || c == "'" || c == "<" || c == "=" || c == "`"){
-
-    } else if(c == EOF){
-
     } else {
-        currentAttribute += c;
-        return UnquotedAttributeValue;
+        currentToken += c;
+        return tagName;
     }
 }
 
-function selfClosingStartTag(c){
-	if(c == ">"){
-        currentToken.isSelfClosing = true;
-        emit(currentToken)
-        return data;
-    } else if(c == "EOF"){
-    	
-    } else {
+//属性
+function beforeAttributeName(c){
     
-    }
-}
-
-function endTagOpen(c){
-	if (c.match(/^[a-zA-Z]$/)){
-		currentToken = {
-            type:"endTag",
-            tagName:""
-        }
-        return tagName(c); //结束标签
-    } else if(c == ">"){ 
-    	
-    } else if(c == EOF){
-    
+    if(c.match(/^[\t\n\f ]$/)){// 等待匹配属性
+        return beforeAttributeName;
+    } else if(c === ">" || c === "/" || c == EOF){
+        return afterAttributeName(c); // 属性结束
+    } else if(c === "="){
+       // return beforeAttributeValue;   // 属性值
     } else {
-    
-    }
-}
-
-function afterAttributeName(c){
-    if(c.match(/^[\t\n\f ]$/)){
-        return afterAttributeName;
-    } else if(c == "/"){ 
-    	return selfClosingStartTag;
-    } else if(c == "="){
-        return beforeAttributeValue;
-    } else if(c == ">"){
-        currentToken[currentAttribute.name] = currentAttribute.value;
-        emit(currentToken);
-        return data
-    } else if(c == EOF){
-
-    } else {
-        currentToken[currentAttribute.name] = currentAttribute.value;
+        // 普通字符
         currentAttribute = {
             name:"",
             value:""
@@ -391,13 +271,313 @@ function afterAttributeName(c){
     }
 }
 
+function attributeName(c){
+    if(c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF){
+        return afterAttributeName(c)
+    } else if(c === "="){
+        return beforeAttributeValue;
+    }else if(c == "\u0000"){  // Null
+        // return "parse error";
+    }else if(c == "\'" || c == "'" || c == "<"){
+        // return "parse error";
+    }else {
+        currentAttribute.name += c;
+        return attributeName;
+    }
+}
 
+function beforeAttributeValue(c){
+    if(c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF){
+        return  beforeAttributeValue
+    } else if(c === "\""){
+        return doubleQuotedAttributeValue;
+    }else if(c == "\'"){
+        return singleQuotedAttributeValue;
+    } else if(c == ">"){
+        // emit()
+        // return data;
+    } else {
+        return unquotedAttributeValue(c);
+    }
+}
+
+function doubleQuotedAttributeValue(c){
+    if(c === "\""){
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        return afterQuotedAttributeValue;
+    } 
+    // else if(c === "&"){
+    //     return
+    // } 
+    else if(c === EOF){
+        return
+    } else if(c === "\u0000"){
+        return 
+    } else{
+        currentAttribute.value += c;
+        return doubleQuotedAttributeValue
+    }
+}
+
+function singleQuotedAttributeValue(c){
+    if(c === "\'"){
+        // set 设置currentAttribute对
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        return afterQuotedAttributeValue;
+    }
+    //  else if(c === "&"){
+    //     // Set the return state to the attribute value (single-quoted) state. Switch to the character reference state.
+    //     return
+    // } 
+    else if(c === EOF){
+        return
+    } else if(c === "\u0000"){
+        return 
+    } else{
+        currentAttribute.value += c;
+        return doubleQuotedAttributeValue
+    }
+}
+
+function unquotedAttributeValue(c){
+    if(c.match(/^[\t\n\f ]$/)){
+        currentToken[currentAttribute.name] = currentAttribute.value;
+
+        return  beforeAttributeName;
+    } else if(c === "/"){
+        currentToken[currentAttribute.name] = currentAttribute.value;
+
+        return selfClosingStartTag;
+    } else if(c == ">"){
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken)
+        return data;
+    } else if(c == "\u0000"){
+
+    } else if(c == "\"" || c == "'" || c == "<" ||c == "=" || c == "`"){
+
+    } else if(c == EOF){
+
+    } else {
+        currentAttribute.value += c;
+        return unquotedAttributeValue;
+    }
+}
+
+function afterQuotedAttributeValue(c){
+    if(c.match(/^[\t\n\f ]$/)){
+        return  beforeAttributeName;
+    } else if(c === "/"){
+        return selfClosingStartTag;
+    } else if(c == ">"){
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken)
+        return data;
+    } else if(c == EOF){
+
+    } else {
+        currentAttribute.value += c;
+        return doubleQuotedAttributeValue;
+    }
+}
+
+//自封闭标签
+function selfClosingStartTag(c){
+    if(c === ">"){
+        currentToken.isSelfClosing = true;
+        // currentToken = {
+        //     type:'selfClosingStartTag'
+        // }
+        emit(currentToken)
+        return data;
+    } else if(c == EOF){
+        
+    } else {
+
+    }
+}
+
+//12.2.5.7 End tag open state
+function endTagOpen(c){
+    if(c.match(/^[a-zA-Z]$/)){
+        currentToken = {
+            type:"endTag",
+            tagName:""
+        }
+        //标签名
+        return tagName(c);
+    } else if(c === ">"){
+        // return endTagName;
+    } else if(c == EOF){
+        return ;
+    } else {
+        return ;
+    }
+
+}
+
+function afterAttributeName(c){
+    if(c.match(/^[\t\n\f ]$/)){// 等待匹配属性
+        return afterAttributeName; 
+    } else if(c === "/"){
+        return selfClosingStartTag; // 属性结束
+    } else if(c === "="){
+        return beforeAttributeValue;   // 属性值
+    } else if(c === ">"){
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        emit(currentToken)
+        return data;
+    } else if(c == EOF){
+        // emit()
+
+    } else {
+        currentToken[currentAttribute.name] = currentAttribute.value;
+        // 普通字符
+        currentAttribute = {
+            name:"",
+            value:""
+        }
+        return attributeName(c)
+    }
+}
+
+//使用状态机 进行状态迁移 解析标签
 module.exports.parseHTML = function parseHTML(html){
-	console.log(html);
+    // console.log(html);
     let state = data;
     for(let c of html){
     	state = state(c);
     }
-    state = start(EOF)
-    console.log(stack[0])
+    state = state(EOF)
+    return stack[0]
 }
+
+// <html maaa=a >
+// <head>
+//     <style>
+//         body div #myid{
+//             width:100px;
+//             background-color: #ff5000;
+//         }
+//         body div img{
+//             width:30px;
+//             background-color: #ff1111;
+//         }
+//     </style>
+// </head>
+// <body>
+//     <div>
+//         <img id="myid"/>
+//         <img />
+//     </div>
+// </body>
+// </html>
+
+
+
+// var ast = css.parse(text);
+// ast 的结构
+// {
+//     "type": "stylesheet",
+//     "stylesheet": {
+//        "rules": [
+//           {
+//              "type": "rule",
+//              "selectors": [
+//                 "body div #myid"
+//              ],
+//              "declarations": [
+//                 {
+//                    "type": "declaration",
+//                    "property": "width",
+//                    "value": "100px",
+//                    "position": {
+//                       "start": {
+//                          "line": 3,
+//                          "column": 13
+//                       },
+//                       "end": {
+//                          "line": 3,
+//                          "column": 24
+//                       }
+//                    }
+//                 },
+//                 {
+//                    "type": "declaration",
+//                    "property": "background-color",
+//                    "value": "#ff5000",
+//                    "position": {
+//                       "start": {
+//                          "line": 4,
+//                          "column": 13
+//                       },
+//                       "end": {
+//                          "line": 4,
+//                          "column": 38
+//                       }
+//                    }
+//                 }
+//              ],
+//              "position": {
+//                 "start": {
+//                    "line": 2,
+//                    "column": 9
+//                 },
+//                 "end": {
+//                    "line": 5,
+//                    "column": 10
+//                 }
+//              }
+//           },
+//           {
+//              "type": "rule",
+//              "selectors": [
+//                 "body div img"
+//              ],
+//              "declarations": [
+//                 {
+//                    "type": "declaration",
+//                    "property": "width",
+//                    "value": "30px",
+//                    "position": {
+//                       "start": {
+//                          "line": 7,
+//                          "column": 13
+//                       },
+//                       "end": {
+//                          "line": 7,
+//                          "column": 23
+//                       }
+//                    }
+//                 },
+//                 {
+//                    "type": "declaration",
+//                    "property": "background-color",
+//                    "value": "#ff1111",
+//                    "position": {
+//                       "start": {
+//                          "line": 8,
+//                          "column": 13
+//                       },
+//                       "end": {
+//                          "line": 8,
+//                          "column": 38
+//                       }
+//                    }
+//                 }
+//              ],
+//              "position": {
+//                 "start": {
+//                    "line": 6,
+//                    "column": 9
+//                 },
+//                 "end": {
+//                    "line": 9,
+//                    "column": 10
+//                 }
+//              }
+//           }
+//        ],
+//        "parsingErrors": []
+//     }
+//  }

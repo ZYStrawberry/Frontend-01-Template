@@ -42,7 +42,7 @@ s = 0 * N^3 + 2 * N^2 + 1 * N^1 + 1
 
 ### 伪类
 1、链接/行为
-- :any-link 所有的超链接'<a href=" ">'
+- :any-link 所有的超链接
 - :link :visited
 - :hover
 - :active

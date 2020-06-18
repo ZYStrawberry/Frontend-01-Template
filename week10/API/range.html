@@ -1,0 +1,79 @@
+
+<html>
+    <head>
+        <title>Range API</title>
+    </head>
+    <body>
+        <div id="a">
+            <span>1</span>
+            <div>2</div>
+            <div>3</div>
+            <p>4</p>
+            <p>5</p>
+        </div>
+        <div id='b'>zhangying<span style="background-color: pink;">123456</span>live in</div>
+        
+    </body>
+
+    <script>
+        var element = document.getElementById("a");
+        
+        // 中规中矩的写法
+        function reverseChildren0(element){
+            let children = Array.prototype.slice.call(element.childrenNodes);
+            for(let child of children){
+                element.removeChild(child)
+            }
+            children.reverse();
+            for(let child of children){
+                element.appendChild(child)
+            }
+        }
+
+        // 使用dom函数 不需要remove child
+        function reverseChildren1(element){
+            var l = element.childrenNodes.length;
+            while(l-- > 0){
+                element.appendChild(element.childrenNodes[l]);
+            }
+        }
+
+        // 使用Range API
+        function reverseChildren2(){
+            
+        }
+
+        reverseChildren2(element);
+
+        // Range API
+        // range 可以插入到文本中，不只是dom元素之间
+        var range = new Range();
+        range.setStart(element, 9)
+        range.setEnd(element, 4)
+
+        var range = document.getSelection().getRangeAt(0)
+        // 其他Range API
+        range.setStartBefore
+        range.setEndBefore
+        range.setStartAfter
+        range.setEndAfter
+
+        range.selectNode
+        range.selectNodeContents
+
+        // 精细操作 
+        var fragment = range.extractContents();
+
+        // Range demo 文本切割
+        let b = document.getElementById("b").childNodes[0];
+        let range = new Range();
+        var fragment = range.extractContents();
+
+        // CSSOM
+        document.styleSheets[0].cssRules
+        // 只能insert 字符串
+        document.styleSheets[0].insertRule("p{color:pink;}",0)
+        document.styleSheets[0].removeRule(0)
+
+    </script>
+</html>

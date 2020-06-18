@@ -147,10 +147,93 @@ DTD： https://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd
 嵌套关系标准：https://html.spec.whatwg.org/multipage/parsing.html/#tree-construction
 
 ### 3、合法元素
+- Element：<tagname>...</tagname>
+- Text：text
+- Comment：<!-- comments -->
+- DocumentType：<!Doctype html>
+- ProcessingInstruction：<?a 1?>   相等与注释，可能会报错
+- CDATA：<![CDATA[ ]]>
+
 ### 4、字符引用
+- &#161;
+- &amp;
+- &lt;
+- &quot;
 
 ## 重学DOM
-### 1、导航类操作
+
+### 1、导航类操作 
+- parentNode = parentElement
+- childNodes
+- firstChild
+- ladtChild
+- nextSibling
+- previousSibling
+
 ### 2、修改操作
+- appendChild
+- insertBefore
+- removeChild
+- replaceChild
+
+- 当我们把一个元素二次插入时，会摘开
+- 操作是实时的，第一次操作之后就已经改变了
+
 ### 3、高级操作
+- compareDocumentPosition 是一个用于比较两个节点中关系的函数
+- contains 检查一个节点是否包含另一个节点的函数
+- isEqualNode 检查两个节点是否完全相同
+- isSameNode 检查两个节点是否是同一个节点，实际上再JavaScript中可以用'==='
+- cloneNode 复制节点，如果传入参数true,则会连同子元素做深拷贝
+
+
+### appendChild 案例
+- appendChild是移动，不是复制。如果移动
+
+
+### Events
+``` addEventListener
+
+document.body.addEventListener("click",{
+	handleEvent:function(){
+		console.log("!!!");	
+	}
+})
+
+```
+
+### 捕获 & 冒泡
+**先冒泡再捕获**
+
+```
+
+<div id="a" style="width:100%;height:200px;background-color:pink;">
+    <div id="b" style="width:100%;height:100px;background-color:blue;">
+
+    </div>
+</div>
+<script>
+    var a = document.getElementById('a');
+    var b = document.getElementById('b');
+    // 默认冒泡，相当于第三个参数是 false
+    a.addEventListener("click",(e)=>{
+        console.log("a")
+    })
+    b.addEventListener("click",(e)=>{
+        console.log("b")
+    })
+    // 加上true,变成捕获
+    a.addEventListener("click",(e)=>{
+        console.log("a2")
+    },true)
+    b.addEventListener("click",(e)=>{
+        console.log("b2")
+    },true)
+</script>
+
+```
+
+### 埋点
+服务端埋点 & 客服端埋点
+业务曝光埋点：需要业务来定义
 

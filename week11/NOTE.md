@@ -121,14 +121,11 @@
         
     }
 </script>
-
 `
 
 #### 步骤二：找到起点到终点的路径
-`
-// 找到路径
 
-async function findPath(map, start, end) {
+`async function findPath(map, start, end) {
         // 怕map被污染
         map = map.slice()
         // 起始点先入队列
@@ -177,10 +174,11 @@ async function findPath(map, start, end) {
         
     }
 `
+
 #### 步骤三：优化最佳路径
 
 `
-// 加上左上，右上，左下，右下 四个节点
+            // 加上左上，右上，左下，右下 四个节点
             
             await insert([x-1,y-1],[x,y])
             await insert([x+1,y-1],[x,y])

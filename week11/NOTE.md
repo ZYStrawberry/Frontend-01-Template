@@ -175,7 +175,7 @@
     }
 `
 
-#### 步骤三：优化最佳路径
+#### 步骤三：添加斜线方向的方格
 
 `
             // 加上左上，右上，左下，右下 四个节点
@@ -189,5 +189,149 @@
             // 所以 lightgreen 的走向总是有直角在的
 `
 
+#### 步骤四：优化最佳路径 Sorted
+
+`
+    class Sorted {
+        constructor(data, compare) {
+            this.data = data;
+            this.compare = compare
+        }
+
+        take() {
+            if(!this.data.length){
+                return ;
+            }
+
+            // 找到最小值
+            let min = this.data[0];
+            let minIndex = 0;
+
+            for(let i = 0; i < this.data.length; i++){
+                if(this.compare(this.data[i],min) < 0){
+                    min = this.data[i];
+                    minIndex = i
+                }
+            }
+            // 最小值交换到数组的最后一个位置，然后再pop出来
+            this.data[minIndex] = this.data[this.data.length - 1];
+            this.data.pop()
+            return min
+        }
+
+        insert(v) {
+            this.data.push(v)
+        }
+
+        get length(){
+            return this.data.length;
+        }
+    }
+`
+#### 步骤四：优化最佳路径的算法 BinaryHeap
+
+
+`class BinaryHeap {
+        constructor(data, compare) {
+            this.data = data;
+            this.compare = compare
+        }
+
+        take() {
+            if(!this.data.length){
+                return ;
+            }
+
+            // 找到最小值
+            let min = this.data[0];
+            let i = 0;
+
+            // 二叉树fix heap
+            while(i < this.data.length) {
+                // 如果 i * 2 + 1 超过堆的数量 直接break
+                if(i * 2 + 1 >= this.data.length) {
+                    break
+                }
+                // 如果 i * 2 + 2 超过堆的数量,i * 2 + 1 没有超过堆的数量
+                // 最后的洞就在 i * 2 + 1 的位置上
+                if(i * 2 + 2 >= this.data.length){
+                    this.data[i] = this.data[i * 2 + 1]
+                    i = i * 2 + 1
+                    break;
+                }
+
+                // 两个叶子节点比较大小
+                if(this.compare(this.data[i * 2 + 1],this.data[i * 2 + 2]) < 0){
+                    this.data[i] = this.data[i * 2 + 1]
+                    i = i * 2 + 1
+                } else {
+                    this.data[i] = this.data[i * 2 + 2]
+                    i = i * 2 + 2
+                }
+            }
+
+            // 如果洞不在最后一个位置上，需要洞的位置和最后的位置进行交换。
+            // 洞的位置是 i, 最后的位置是 this.data.length - 1
+            if(i < this.data.length - 1) {
+                // 交换位置
+                this.insertAt(i, this.data.pop())
+            } else {
+                // ？
+                this.data.pop()
+            }
+
+            return min
+        }
+
+        insertAt(i, v) {
+            this.data[i] = v
+            // 找到父节点Math.floor((i-1)/2) 比较大小 交换位置
+            while(i > 0 && this.compare(v, this.data[Math.floor((i-1)/2)] < 0)){
+                this.data[i] = this.data[Math.floor((i-1)/2)];
+                this.data[Math.floor((i-1)/2)] = v;
+                i = Math.floor((i-1)/2)
+            }
+        }
+
+        insert(v) {
+            this.insertAt(this.data.length, v)
+        }
+
+        get length(){
+            return this.data.length;
+        }
+    }`
+    
+    
+### 正则表达式
+1、match: 
+- ()  
+- /g  简单匹配
+- ?:  不捕获
+
+2、replace
+- 可以传函数 或者 字符串
+
+`
+"abc".replace(/a(b)c/, function(str, $1){
+    console.log(str, $1); // abc b
+    return $1+$1;  // "bb"
+})
+
+"abc".replace(/a(b)c/,"$1")  // b
+
+// 想表示$,就要写两个$
+"abc".replace(/a(b)c/,"$$1")  // $1
+`
+
+3、exec()  重点
+
+        let lastIndex = 0;
+        let token ;
+        do{
+            token = inputElement.exec(source);
+            console.log(token)
+        }
+        while(inputElement.lastIndex - lastIndex == token .lenth)
 
 

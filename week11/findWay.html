@@ -124,15 +124,6 @@
         }
     }
 
-    // var heap = new BinaryHeap([], (a,b) => a-b);
-    // heap.insert(1)
-    // heap.insert(5)
-    // heap.insert(3)
-    // heap.insert(8)
-    // heap.insert(2)
-    // heap.insert(11)
-    // heap.insert(0)
-
     var map = localStorage.map ? JSON.parse(localStorage.map) : new Array(10000).fill(0);
     let container = document.getElementById("container");
     for(let y = 0; y < 100; y++) {
@@ -179,6 +170,10 @@
     async function findPath(map, start, end) {
         // 怕map被污染
         map = map.slice()
+        
+        let table = new Array(10000).fill(Infinity); //记录到起点的长度
+
+        table[start[1] * 100 + start[0]] = 0;
 
         // x^2 + y^2 距离
         function distance([x,y]){
@@ -190,17 +185,22 @@
         // let collection = new Sorted([start], (a,b)=> distance(a) - distance(b))
         let collection = new BinaryHeap([start], (a,b)=> distance(a) - distance(b))
 
-        async function insert([x,y],pre){
+        async function insert([x,y], pre, fromStart){//table里存的是fromStart，到起点的距离
             // 出界了不能push
             if(x >= 100 || y >= 100 || x < 0 || y < 0)
                 return ;
             // 遇到障碍了，不能push
             if(map[100*y+x] !== 0)
                 return ;
-
+            if(fromStart >= table[100 * y + x])
+                return;
+           
             // push之前标记一下节点
             // pre 是上一个节点的坐标
             map[100*y+x] = pre
+
+            table[100 * y + x] = fromStart;
+
             container.children[100*y+x].style.backgroundColor = 'lightgreen';
 
             await sleep(1)
@@ -212,6 +212,7 @@
             // shift() 方法用于把数组的第一个元素从其中删除,并返回第一个元素的值。
             let [x,y] = collection.take()
             // console.log(x,y)
+            let fromStart = table[100 * y + x];
             // 找到终点了
             if(x === end[0] && y === end[1]){
                 let path = []
@@ -225,17 +226,24 @@
                 return path;
             }
             // 删掉一个节点，加入 上下左右 四个节点
-            await insert([x-1,y],[x,y])
-            await insert([x+1,y],[x,y])
-            await insert([x,y-1],[x,y])
-            await insert([x,y+1],[x,y])
+            await insert([x - 1, y], [x, y], fromStart + 1);
+            await insert([x + 1, y], [x, y], fromStart + 1);
+            await insert([x, y - 1], [x, y], fromStart + 1);
+            await insert([x, y + 1], [x, y], fromStart + 1);
 
             // 加上左上，右上，左下，右下 四个节点
             
-            await insert([x-1,y-1],[x,y])
-            await insert([x+1,y-1],[x,y])
-            await insert([x-1,y+1],[x,y])
-            await insert([x+1,y+1],[x,y])
+            if(map[y*100 + x-1] === 0 || map[(y-1)*100 + x] === 0)
+                await insert([x-1,y-1],[x,y], fromStart + 1.4)
+
+            if(map[y*100 + x+1] === 0 || map[(y-1)*100 + x] === 0)
+                await insert([x+1,y-1],[x,y], fromStart + 1.4)
+
+            if(map[y*100 + x-1] === 0 || map[(y+1)*100 + x] === 0)
+                await insert([x-1,y+1],[x,y], fromStart + 1.4)
+
+            if(map[y*100 + x+1] === 0 || map[(y+1)*100 + x] === 0)
+                await insert([x+1,y+1],[x,y], fromStart + 1.4)
 
             // 8个点加起来的整体的形状是正方向的
             // 所以 lightgreen 的走向总是有直角在的

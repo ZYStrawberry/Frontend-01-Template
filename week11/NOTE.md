@@ -227,7 +227,7 @@
         }
     }
 
-#### 步骤四：优化最佳路径的算法 BinaryHeap
+#### 步骤五：优化最佳路径的算法 BinaryHeap
 
 
     class BinaryHeap {
@@ -300,7 +300,39 @@
             return this.data.length;
         }
     }
-    
+   
+#### 步骤六：优化算法 斜角需要加判断 不能穿过
+            if(map[y*100 + x-1] === 0 || map[(y-1)*100 + x] === 0)
+                await insert([x-1,y-1],[x,y])
+
+            if(map[y*100 + x+1] === 0 || map[(y-1)*100 + x] === 0)
+                await insert([x+1,y-1],[x,y])
+
+            if(map[y*100 + x-1] === 0 || map[(y+1)*100 + x] === 0)
+                await insert([x-1,y+1],[x,y])
+
+            if(map[y*100 + x+1] === 0 || map[(y+1)*100 + x] === 0)
+                await insert([x+1,y+1],[x,y])
+
+
+
+#### 步骤七：优化算法 加上斜率1和1.4
+            await insert([x - 1, y], [x, y], fromStart + 1);
+            await insert([x + 1, y], [x, y], fromStart + 1);
+            await insert([x, y - 1], [x, y], fromStart + 1);
+            await insert([x, y + 1], [x, y], fromStart + 1);
+
+            if(map[y*100 + x-1] === 0 || map[(y-1)*100 + x] === 0)
+                await insert([x-1,y-1],[x,y], fromStart + 1.4)
+
+            if(map[y*100 + x+1] === 0 || map[(y-1)*100 + x] === 0)
+                await insert([x+1,y-1],[x,y], fromStart + 1.4)
+
+            if(map[y*100 + x-1] === 0 || map[(y+1)*100 + x] === 0)
+                await insert([x-1,y+1],[x,y], fromStart + 1.4)
+
+            if(map[y*100 + x+1] === 0 || map[(y+1)*100 + x] === 0)
+                await insert([x+1,y+1],[x,y], fromStart + 1.4)
     
 ### 正则表达式
 1、match: 

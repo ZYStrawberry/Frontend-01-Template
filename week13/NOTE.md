@@ -15,27 +15,7 @@ MDN：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_O
       handler
         一个通常以函数作为属性的对象，各属性中的函数分别定义了在执行各种操作时代理 p 的行为。
 
-### Proxy DEMO 01
-
-    <script>
-        let object = {
-            a: 1,
-            b: 2
-        }
-
-        let proxy = new Proxy(object, {
-            get(obj, prop){
-                console.log(obj, prop)
-                return obj[prop];
-            },
-            defineProperty(obj, prop, desc){
-                console.log(arguments)
-                return Object.defineProperty(obj, prop, desc)
-            }
-        })
-    </script>
-    
-### Proxy DEMO 02
+### Proxy DEMO
 
     <script>
         let handlers = []
@@ -81,76 +61,51 @@ MDN：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_O
 
     </script>
     
-### Proxy DEMO 03
-
-
-    <script>
-        let handlers = new Map()
-
-        let useReactivities = [];
-
-        let object = {
-            a: 1,
-            b: 2
-        }
-
-        function reactive(obj) {
-            return new Proxy(obj, {
-                get(obj, prop){
-                    useReactivities.push([obj, prop])
-                    return obj[prop];
-                },
-                set(obj, prop,val){
-                    obj[prop] = val
-                    if(handlers.get(obj))
-                        if(handlers.get(obj).get(prop))
-                            for(let handler of handlers.get(obj).get(prop)){
-                                handler()
-                            }
-                    console.log(obj, prop, val)
-                    return obj[prop];
-
-                }
-            })
-        }
-
-        function effect(handler){
-            useReactivities = [];
-            handler()
-
-            console.log(useReactivities)
-            for(let useReactivity of useReactivities){
-                let [obj, prop] = useReactivity
-                console.log([obj, prop])
-
-                if(!handlers.has(obj)){
-                    handlers.set(obj, new Map())
-                }
-
-                if(!handlers.get(obj).has(prop)){
-                    handlers.get(obj).set(prop,[])
-                }
-
-                handlers.get(obj).get(prop).push(handler)
-            }
-        }
-
-        let proxy = new reactive(object)
-
-        console.log(proxy)
-
-        let  dummy;
-
-        effect(() => dummy = proxy.a)
-        console.log(dummy) // 1
-        
-        proxy.a = 2;
-        console.log(dummy) // 2
-
-    </script>
- 
- 
-### Proxy DEMO 04
-
     
-## Range & 组件
+## Range
+
+
+## 对象 与 组件
+
+## ßComponent
+- State
+- Children
+
+### Attribute VS Property
+- Attribute 强调描述性
+- Property 强调从属关系
+
+    需要注意区分
+    $("input").attr()
+    $("input").val()
+
+### lifeCycle
+
+#### children
+
+- content型children 与 Template 的children
+
+## 组件
+    carousel
+
+        state
+            activeIndex
+
+        property
+            loop time imglist autoplay color forward autoplay
+
+        attribute
+            startIndex loop time imglist autoplay color forward
+        children
+            2种
+        event
+            change click hover swipe resize dbclick
+        method
+            next() prev() goto() play() stop()
+
+        config
+            mode: "useRAF" "useTimeout"
+
+            setInterval(tick, 16)
+            setTimeout()
+    carouselView

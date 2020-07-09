@@ -3,14 +3,16 @@
         <title>2020-07-04 Range Demo</title>
     </head>
     <body>
-        <div class="container"> 文字文字文字文字文字文字文字文字文字文字文字文字文字字
-            文字文字字文字文字文字文字文字文字文字文字文字文字文字文字文字文字字文字文字文字文字
+        <div id="container"> 
+            文字文字文字文字文字文字文字文字文字文字文字文字文字字字文字文字文字文字文字文字文字字
+            文字文字字文字文字文字文字文字文字文字文字文字文字文字文字文字文字字文字文字文字文字字
             文字文字文字文字文字文字文字文字文字文字字文字文字文字文字文字文字文字文字文字文字文字
             文字文字文字字文字文字文字文字文字文字文字文字文字文字文字文字文字文字字文字文字文字文
             字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字字文字文字文
             字文字文字文字文字文字文字文字文字文字文字文字文字文字文字字文字文字文字文字文字文字文
-            字文字文字文字文字文字文字字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文字</div>
-        <div id="dragable" style="width:100px;height:100px;background-color:pink;"></div>
+            字文字文字文字文字文字文字字文字文字文字文字文字文字文字文字文字文字文字文字文字文字文
+        </div>
+        <div id="dragable" style="width:100px;height:100px;background-color:pink;display: inline-block;"></div>
         <script>
             let dragable = document.getElementById("dragable");
 
@@ -22,15 +24,15 @@
 
                 let move = event => {
 
-                    let b = nearest(event.clientX, event.clientY);
+                    let range = nearest(event.clientX, event.clientY);
 
-                    b.insertNode()
+                    range.insertNode(dragable)
                     // let x = baseX + event.clientX - startX, y = baseY + event.clientY - startY;
                     // dragable.style.transform = `translate(${x}px, ${y}px)`;
 
                 }
 
-                let up = event=>{
+                let up = event => {
                     baseX = baseX + event.clientX - startX, baseY = baseY + event.clientY - startY;
                     document.removeEventListener("mousemove",move)
                     document.removeEventListener("mouseup",up)
@@ -43,21 +45,24 @@
             let ranges = [];
 
             let container = document.getElementById("container");
-
-            for(var i = 0; i < container.childNodes[0].textContent.length; i++){
+            console.log(container)
+            for(let i = 0; i < container.childNodes[0].textContent.length; i++){
                 let range = document.createRange();
-                range.setStart(container.childNodes[0],i)
-                range.setEnd(container.childNodes[0],i);
-                console.log(range.getBoundingClientRect())
+                range.setStart(container.childNodes[0], i)
+                range.setEnd(container.childNodes[0], i);
+                // console.log(range.getBoundingClientRect())
                 ranges.push(range)
             }
 
+            // 找到离当前鼠标最近的位置
             function nearest(x0, y0){
                 let nearestRange = null;
+                // 找最小距离
                 let distance = Infinity;
                 
                 for(let range of ranges){
                     let {x, y} = range.getBoundingClientRect();
+                    // 计算距离
                     let d = (x0 - x) ** 2 + (y0 - y) ** 2;
 
                     if(d < distance) {
@@ -69,7 +74,8 @@
                 return nearestRange
             }
 
-            document.addEventListener("selectStart",event => event.preventDefault)
+            // 避免选中文字
+            document.addEventListener("selectstart",event => event.preventDefault())
         </script>
     </body>
 </html>

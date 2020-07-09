@@ -3,6 +3,8 @@
 <input id="b" type=range min=0 max=255 />
 
 <div id="color" style="width:100px;height:100px;"></div>
+
+<div id="text">hello {{name}}!</div>
 <script>
 
     let handlers = new Map()
@@ -111,4 +113,17 @@
         document.getElementById("color").style.backgroundColor = `rgb(${p.r},${p.g},${p.b})`
     })
 
+
+    // 2020-07-04 Range的使用实列
+    let range = document.createRange();
+    range.setStart(document.getElementById("text").childNodes[0], 6);
+    range.setEnd(document.getElementById("text").childNodes[0], 14);
+
+    let data = reactive({text:'world'})
+    effct(() => {
+        range.extractContents();
+        range.insertNode(document.createTextNode(data.text))
+    })
+
+    data.text = "zhangying"
 </script>

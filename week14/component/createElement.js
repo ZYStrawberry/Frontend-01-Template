@@ -1,7 +1,7 @@
 
 // 这里的方法名和webpack.config.js里的pragma配置要保持一致
 
-function createElement(Cls, attributes, ...children){
+export function createElement(Cls, attributes, ...children){
     // console.log(arguments)
     // console.log(attributes) 没有attributes的时候为null
     let o;
@@ -24,15 +24,16 @@ function createElement(Cls, attributes, ...children){
     // console.log(children)
     let visit =  (children) =>{
         for(let child of children){
+            
+            if(typeof child === "object" && child instanceof Array){
+                visit(child)
+                continue
+            }
             // 处理文字
             if(typeof child === "string"){
                 child = new Text(child)
                 console.log(child)
             }
-            if(typeof child === "object" && child instanceof Array){
-                visit(child)
-            }
-
             o.appendChild(child)
             // o.children.push(child)
         }

@@ -103,26 +103,6 @@ class Carousel {
                 console.log(position)
                 position = nextPosition
             },16);// 浏览器 一帧16ms
-
-            // requestAnimationFrame要使用两次
-
-            // requestAnimationFrame(function(){
-            //     // 这里第一帧生效
-            //     requestAnimationFrame(function(){
-            //     // 这里第二帧生效
-
-            //         current.style.transition = "ease 0.5s";
-            //         next.style.transition = "ease 0.5s";
-            //         //  -100 终点位置
-            //         current.style.transform = `translateX(${-100 -100 * position}%)`
-            //         next.style.transform = `translateX(${-100 * nextPosition}%)`
-            //         // position+=1;
-            //         // 对数据的长度取余来实现循环
-            //         console.log(position)
-            //         position = nextPosition
-            //     })
-            // })
-           
             
             // 循环
             setTimeout(nextpic, 2000)
@@ -130,7 +110,7 @@ class Carousel {
 
         // nextpic(); // 第一张没有了显示时间
         // 第一张显示2秒
-        // setTimeout(nextpic, 2000)
+        setTimeout(nextpic, 2000)
         
         return root;
     }

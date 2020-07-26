@@ -4,27 +4,24 @@ module.exports = function(source, map){
     let tree = parser.parseHTML(source)
 
     // console.log("tree",JSON.stringify(tree))
-    // console.log(tree.children[1].children[0].content)
+    // console.log(tree.children)
     // console.log("my loader id running>>>>>>",this.resourcePath)
     
     let template = null;
     let script = null;
 
     for(let node of tree.children){
-        // console.log("node",node)
-        if(node.tagName == "tamplate"){
-            // console.log("children", node.children)
+        if(node.tagName == 'template'){
             template = node.children.filter(e => e.type != "text")[0];
-            // console.log("template", template)
         }
         
-        if(node.tagName == "script"){
+        if(node.tagName == 'script'){
             script = node.children[0].content
         }
     }
 
     // let createCode = "";
-    // console.log("template", template)
+    console.log("template", template)
 
     let visit = (node) => {
         if(node.type === 'text'){
@@ -42,7 +39,7 @@ module.exports = function(source, map){
 
     let r = `
 import {createElement, Text, Wrapper} from "./createElement";
-export calss Carousel {
+export class Carousel {
     setAttribute(name, value){
         this[name] = value
     }
@@ -57,3 +54,12 @@ export calss Carousel {
 console.log(r)
     return r;
 }
+
+// [ { type: 'element',
+//     children: [ [Object], [Object], [Object] ],
+//     attributes: [ [Object], [Object] ],
+//     tagName: 'template' },
+//   { type: 'element',
+//     children: [ [Object] ],
+//     attributes: [ [Object], [Object] ],
+//     tagName: 'script' } ]

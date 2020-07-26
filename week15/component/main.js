@@ -145,7 +145,7 @@ class Carousel {
 //     <div>text text text </div>
 // </MyComponent>
 
-console.log(Carousel)
+// console.log(Carousel)
 let component = <Carousel data={
     [
         "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",

@@ -1,0 +1,7 @@
+<body></body>
+<script src="./gesture.js"></script>
+<script>
+    window.addEventListener('constextmenu', event=>event.preventDefault)
+    document.addEventListener('selectstart', event=>event.preventDefault)
+    document.addEventListener('touchmove', event=>event.preventDefault, {passive:false})
+</script>

@@ -42,6 +42,7 @@ export function createElement(Cls, attributes, ...children){
     visit(children)
     return o;
 }
+
 export class Text{
     constructor(text){
         this.children = [];

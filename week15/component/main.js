@@ -46,6 +46,7 @@ class MyComponent{
 }
 */
 
+/*
 class Carousel {
     constructor(config){
         // console.log(config)
@@ -119,7 +120,7 @@ class Carousel {
     mountTo(parent){
         this.render().mountTo(parent)
     }
-}
+}*/
 
 
 // let component = <div id="a" cls="b" style="width:100px;height:100px;background-color:lightgreen">
@@ -144,6 +145,7 @@ class Carousel {
 //     <div>text text text </div>
 // </MyComponent>
 
+console.log(Carousel)
 let component = <Carousel data={
     [
         "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",

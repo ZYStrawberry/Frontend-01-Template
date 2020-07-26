@@ -11,7 +11,7 @@ export default {
     },
     computed: {
         reverseMessage: function () {
-            this.message = this.message.split('').reverse().join('')
+           return this.message.split('').reverse().join('')
         }
     }
 }

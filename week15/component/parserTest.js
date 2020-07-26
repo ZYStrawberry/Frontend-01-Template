@@ -1,4 +1,4 @@
-var parser = require("./parser(1).js")
+var parser = require("./parser.js")
 
 
 parser.parseHTML(`

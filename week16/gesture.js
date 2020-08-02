@@ -1,138 +1,184 @@
-let element = document.body;
-
-export function enableGesture(element) {
-
-
-    // let contexts = new Map();
+function enableGesture(element) {
     let contexts = Object.create(null);
 
+    // 定义为symbol防止和touch的identifier冲突
     let MOUSE_SYMBOL = Symbol("mouse");
-
-    if(!document.ontouchstart !== null ) 
+    // 鼠标模式
+    if(document.ontouchstart !== null)
         element.addEventListener('mousedown', (event) => {
             contexts[MOUSE_SYMBOL] = Object.create(null);
+            // console.log(contexts[MOUSE_SYMBOL])
+
             start(event, contexts[MOUSE_SYMBOL])
+
             let mousemove = event => {
                 move(event, contexts[MOUSE_SYMBOL])
                 // console.log(event.clientX, event.clientY);
             }
+
             let mouseend = event => {
                 end(event, contexts[MOUSE_SYMBOL])
-                document.addEventListener('mousemove', mousemove)
-                document.addEventListener('mouseup', mouseend)
+                document.removeEventListener('mousemove', mousemove)
+                document.removeEventListener('mouseup', mouseend)
             }
+
             document.addEventListener('mousemove', mousemove)
             document.addEventListener('mouseup', mouseend)
         })
 
-    element.addEventListener('touchstart', event => {
-        for (let touch of event.changedTouches) {
-            contexts[touch.indentifier] = Object.create(null);
-            start(touch, contexts[touch.indentifier])
+    document.addEventListener('touchstart', event => {
+        // console.log(event.changedTouches[0])
+        for (let touch of event.changedTouches[0]) {
+            contexts[touch.identifier] = Object.create(null);
+            start(touch, contexts[touch.identifier])
         }
     })
 
-    element.addEventListener('touchmove', event => {
-        for (let touch of event.changedTouches) {
-
-            move(touch, contexts[touch.indentifier])
+    document.addEventListener('touchmove', event => {
+        for (let touch of event.changedTouches[0]) {
+            contexts[touch.identifier] = Object.create(null);
+            move(touch, contexts[touch.identifier])
         }
     })
 
-    element.addEventListener('touchend', event => {
-        for (let touch of event.changedTouches) {
-
-            end(touch, contexts[touch.indentifier])
-            delete contexts[touch.indentifier]
-
+    document.addEventListener('touchend', event => {
+        for (let touch of event.changedTouches[0]) {
+            end(touch, contexts[touch.identifier])
+            delete contexts[touch.identifier]
         }
     })
 
-    element.addEventListener('touchcancel', event => {
-        for (let touch of event.changedTouches) {
-            cancel(touch, contexts[touch.indentifier])
-
-            delete contexts[touch.indentifier]
+    document.addEventListener('touchcancel', event => {
+        for (let touch of event.changedTouches[0]) {
+            cancel(touch, contexts[touch.identifier])
+            delete contexts[touch.identifier]
         }
     })
-
-    // tap
-    // pan - panstart panmove panend
-    // flick(swiper)
-    // press - pressstart pressend
 
 
     let start = (point, context) => {
-        context.startX = point.clientX,context.startY = point.clientY;
+        element.dispatchEvent(new CustomEvent('start', {
+            startX:point.clientX,
+            startY:point.clientY,
+            clientX:point.clientX,
+            clientY:point.clientY
+         }))
+        
+        // console.log('start', point.clientX, point.clientY);
+        context.startX = point.clientX;
+        context.startY = point.clientY;
+
+        // 判断flick事件
+        context.moves = [];
+
+        // 区分三个点击类型
         context.isTap = true;
         context.isPan = false;
         context.isPress = false;
-        context.timeoutHandler = setTimeout(() => {
-            if (context.isPan)
+
+        // 点击超过0.5S才算press,press move 一定距离之后会变成 Pan 
+        context.timeoutHandler = setTimeout(()=>{
+            // 如果是点击事件就不能move
+            if(context.isPan)
                 return;
             context.isTap = false;
             context.isPan = false;
             context.isPress = true;
-        }, 500)
-
-        // console.log(point.clientX, point.clientY);
-        console.log('start');
+            element.dispatchEvent(new CustomEvent('pressstart', {}))
+        },500)
     }
 
     let move = (point, context) => {
-        let dx = point.startX - context.clientX;
-        let dy = point.startY - context.clientY;
+        let dx = point.clientX - context.startX;
+        let dy = point.clientY - context.startY;
+        // console.log('move', dx, dy);
+
+        // 距离超过100
         if (dx ** 2 + dy ** 2 > 100 && !context.isPan) {
+            
+            if(context.isPress)
+                element.dispatchEvent(new CustomEvent('presscancel', {}))
+            
             context.isTap = false;
             context.isPan = true;
             context.isPress = false;
-            console.log('pantart');
+            console.log('panstart');
+            
+            element.dispatchEvent(new CustomEvent('panstart', {
+                startX:context.startX,
+                startY:context.startY,
+                clientX:point.clientX,
+                clientY:point.clientY
+            }))
         }
 
-
+        
 
         
-        if (context.isPan){
-            context.move.push({
+        if(context.isPan){
+            // 添加时间和位置
+            context.moves.push({
                 dx,dy,
                 t:Date.now()
             })
-            context.moves = context.moves.filter(recoed => Date.now() - record.t > 300)
-            console.log("pan")
-            
+            // 时间差小于300ms 的算 flick
+            context.moves = context.moves.filter(record => Date.now() - record.t < 300)
+        
+            element.dispatchEvent(Object.assign(new CustomEvent('pan'), {
+                startX:context.startX,
+                startY:context.startY,
+                clientX:point.clientX,
+                clientY:point.clientY
+            }))
         }
-        // console.log('move');
-
-        // console.log(point.clientX, point.clientY); 
     }
 
     let end = (point, context) => {
-        if(context,isPan) {
-            let dx = point.startX - context.clientX;
-            let dy = point.startY - context.clientY;
+       
+        if(context.isPan){
+            
+            let dx = point.clientX - context.startX;
+            let dy = point.clientY - context.startY;
             let record = context.moves[0];
-            Math.sqrt((reord.dx - dx)**2 + (record.dy - dy) **2) / (Date.now() - )
-        }
-        console.log('end');
-        if (context.isTap) {
-            console.log('tap')
-        }
-        if (context.isPan) {
-            console.log('pan')
-        }
-        if (context.isPress) {
-            console.log('press')
+            // 速度=距离/时间
+            let speed = Math.sqrt((record.dx - dx) ** 2 + (record.dy - dy) ** 2 ) / (Date.now() - record.t) 
+            console.log(speed)
 
+            let isFlick = speed > 3
+            // 速度大于3的算flick事件
+            if(isFlick) {
+                element.dispatchEvent(new CustomEvent('flick', {
+                    startX:context.startX,
+                    startY:context.startY,
+                    clientX:point.clientX,
+                    clientY:point.clientY,
+                    speed: speed
+                }))
+            }
+
+            element.dispatchEvent(Object.assign(new CustomEvent('panend'), {
+                startX:context.startX,
+                startY:context.startY,
+                clientX:point.clientX,
+                clientY:point.clientY,
+                speed: speed,
+                isFlick: isFlick
+            }))
         }
+
+        if(context.isTap){
+            element.dispatchEvent(new CustomEvent('tap', { }))
+        }
+
+        if(context.isPress)
+            element.dispatchEvent(new CustomEvent('pressend', { }))
+
+
         clearTimeout(context.timeoutHandler)
-        // console.log(point.clientX, point.clientY);
     }
 
-    let cancel = (point, context) => {
-        console.log('cancel');
+    let cancel = (point, context) => {   
+        element.dispatchEvent(new CustomEvent('cancel', { }))
         clearTimeout(context.timeoutHandler)
-
-        // console.log(point.clientX, point.clientY);
     }
-
 }

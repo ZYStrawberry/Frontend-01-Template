@@ -1,8 +1,9 @@
 import {createElement, Text, Wrapper} from "./createElement";
-import {Carousel} from "./carousel.view";
+// import {Carousel} from "./carousel.view";
 
+import {Timeline, Animation} from "./animation.js"
+import {ease, linear} from "./cubicBezier.js"
 
-/*
 class MyComponent{
     constructor(config){
         // console.log(config)
@@ -44,9 +45,7 @@ class MyComponent{
         
     }
 }
-*/
 
-/*
 class Carousel {
     constructor(config){
         // console.log(config)
@@ -74,7 +73,7 @@ class Carousel {
                     </div>
 
         let position = 0;
-
+        let timeline = new Timeline;
         let nextpic = () => {
             // 先计算出下一张的位置
             let nextPosition = (position + 1) % this.data.length;
@@ -83,28 +82,16 @@ class Carousel {
             let current = children[position];
             let next = children[nextPosition];
           
-            // 起始位置 0  100
-            // ease 0s 可以用 none 代替
-            current.style.transition = "ease 0s"
-            next.style.transition = "ease 0s"
+            let currentAnimation = new Animation(current.style, "transition", -100 * position, -100-100*position, 500, 0, ease, v => `translateX(${v}%)`);
+            let nextAnimation = new Animation(next.style, "transition", 100 - 100 * nextPosition, -100*nextPosition, 500, 0, ease, v => `translateX(${v}%)`);
 
-            current.style.transform = `translateX(${ -100 * position}%)`
-            next.style.transform = `translateX(${100 -100 * nextPosition}%)`              
+            timeline.add(currentAnimation)
+            timeline.add(nextAnimation)
 
+            timeline.start()
 
             // transition生效需要时间，所以需要加个setTimeout时间间隔
-            setTimeout(() => {
-                current.style.transition = ""; // "" means use css rules
-                next.style.transition = "";
-                 // 终点位置  -100 0
-                current.style.transform = `translateX(${-100 -100 * position}%)`
-                next.style.transform = `translateX(${-100 * nextPosition}%)`
-                
-                // 对数据的长度取余来实现循环
-                // position+=1; 
-                console.log(position)
-                position = nextPosition
-            },16);// 浏览器 一帧16ms
+            position = nextPosition
             
             // 循环
             setTimeout(nextpic, 2000)
@@ -120,7 +107,7 @@ class Carousel {
     mountTo(parent){
         this.render().mountTo(parent)
     }
-}*/
+}
 
 
 // let component = <div id="a" cls="b" style="width:100px;height:100px;background-color:lightgreen">

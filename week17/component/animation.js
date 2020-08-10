@@ -17,11 +17,11 @@ export class Timeline{
     
             for(let animation of this.animations){
                 
-                let {object, property,start, end, timingFunction, delay,duration,addTime, template} = animation;
+                let {object, property,start, end, timingFunction, delay,duration, template} = animation;
                 
-                addTime = this.addTimes.get(animation)
+                let addTime = this.addTimes.get(animation)
                 
-                if(t < delay + addtime) {
+                if(t < delay + addTime) {
                     continue;
                 }
                 let progression = timingFunction((t - delay - addTime) / duration); // 0-1的范围
@@ -85,7 +85,7 @@ export class Timeline{
         if(this.state === "playing")
             this.pause()
         for(let animation of this.finishedAnimations)
-            this.animationsadd(animation)
+            this.animations.add(animation)
         
         // add
         this.finishedAnimations = new Set();
@@ -101,10 +101,9 @@ export class Timeline{
         if(this.state === "playing")
             this.pause()
         this.animations = new set();
-        this.finishedAnimation = new set();
+        this.finishedAnimations = new set();
         this.addTimes = new Map();
         this.requestID = null;
-        this.state = "inited"
         this.startTime = Date.now();
         this.pauseTime = null;
         this.state = "inited"
@@ -118,9 +117,9 @@ export class Timeline{
             this.tick();
         
         if(this.state === "playing")
-            this.animation.set(animation, addTime !== void 0 ? addTime : Date.now() - this.startTime )
+            this.addTimes.set(animation, addTime !== void 0 ? addTime : Date.now() - this.startTime )
         else
-            this.animation.set(animation, addTime !== void 0 ? addTime : 0)
+            this.addTimes.set(animation, addTime !== void 0 ? addTime : 0)
 
     }
 }
@@ -154,10 +153,10 @@ export class ColorAnimation{
     }
     valueFromProgression(progression) {
         return {
-            r:this.start.r + progression * (this.end.r - this.start.r),
-            g:this.start.g + progression * (this.end.g - this.start.g),
-            b:this.start.b + progression * (this.end.b - this.start.b),
-            a:this.start.a + progression * (this.end.a - this.start.a),
+            r: this.start.r + progression * (this.end.r - this.start.r),
+            g: this.start.g + progression * (this.end.g - this.start.g),
+            b: this.start.b + progression * (this.end.b - this.start.b),
+            a: this.start.a + progression * (this.end.a - this.start.a),
         }
     }
 }

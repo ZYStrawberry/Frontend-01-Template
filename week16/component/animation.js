@@ -21,7 +21,7 @@ export class Timeline{
                 
                 let addTime = this.addTimes.get(animation)
                 
-                if(t < delay + addtime) {
+                if(t < delay + addTime) {
                     continue;
                 }
                 let progression = timingFunction((t - delay - addTime) / duration); // 0-1的范围

@@ -1,4 +1,4 @@
-function enableGesture(element) {
+export function enableGesture(element) {
     let contexts = Object.create(null);
 
     // 定义为symbol防止和touch的identifier冲突
@@ -103,13 +103,18 @@ function enableGesture(element) {
             context.isPan = true;
             context.isPress = false;
             console.log('panstart');
-            
-            element.dispatchEvent(new CustomEvent('panstart', {
+            element.dispatchEvent(Object.assign(new CustomEvent('panstart'), {
                 startX:context.startX,
                 startY:context.startY,
                 clientX:point.clientX,
                 clientY:point.clientY
             }))
+            // element.dispatchEvent(new CustomEvent('panstart', {
+            //     startX:context.startX,
+            //     startY:context.startY,
+            //     clientX:point.clientX,
+            //     clientY:point.clientY
+            // }))
         }
 
         
@@ -123,7 +128,7 @@ function enableGesture(element) {
             })
             // 时间差小于300ms 的算 flick
             context.moves = context.moves.filter(record => Date.now() - record.t < 300)
-        
+            console.log('pan');
             element.dispatchEvent(Object.assign(new CustomEvent('pan'), {
                 startX:context.startX,
                 startY:context.startY,
@@ -146,16 +151,23 @@ function enableGesture(element) {
 
             let isFlick = speed > 3
             // 速度大于3的算flick事件
-            if(isFlick) {
-                element.dispatchEvent(new CustomEvent('flick', {
-                    startX:context.startX,
-                    startY:context.startY,
-                    clientX:point.clientX,
-                    clientY:point.clientY,
-                    speed: speed
-                }))
-            }
-
+            // if(isFlick) {
+            //     // element.dispatchEvent(new CustomEvent('flick', {
+            //     //     startX:context.startX,
+            //     //     startY:context.startY,
+            //     //     clientX:point.clientX,
+            //     //     clientY:point.clientY,
+            //     //     speed: speed
+            //     // }))
+            //     element.dispatchEvent(Object.assign(new CustomEvent('flick'), {
+            //         startX:context.startX,
+            //         startY:context.startY,
+            //         clientX:point.clientX,
+            //         clientY:point.clientY,
+            //         speed: speed
+            //     }))
+            // }
+           
             element.dispatchEvent(Object.assign(new CustomEvent('panend'), {
                 startX:context.startX,
                 startY:context.startY,
@@ -164,21 +176,28 @@ function enableGesture(element) {
                 speed: speed,
                 isFlick: isFlick
             }))
+            console.log('panend');
         }
 
         if(context.isTap){
-            element.dispatchEvent(new CustomEvent('tap', { }))
+            // element.dispatchEvent(new CustomEvent('tap', { }))
+            element.dispatchEvent(Object.assign(new CustomEvent('tap'), { }))
+            
         }
 
         if(context.isPress)
-            element.dispatchEvent(new CustomEvent('pressend', { }))
+            element.dispatchEvent(Object.assign(new CustomEvent('pressend'), { }))
+
+            // element.dispatchEvent(new CustomEvent('pressend', { }))
 
 
         clearTimeout(context.timeoutHandler)
     }
 
     let cancel = (point, context) => {   
-        element.dispatchEvent(new CustomEvent('cancel', { }))
+        // element.dispatchEvent(new CustomEvent('cancel', { }))
+        element.dispatchEvent(Object.assign(new CustomEvent('cancel'), { }))
+        
         clearTimeout(context.timeoutHandler)
     }
 }

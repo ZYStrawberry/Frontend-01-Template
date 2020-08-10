@@ -1,5 +1,6 @@
 
 // 这里的方法名和webpack.config.js里的pragma配置要保持一致
+import {enableGesture} from "./gesture.js"
 
 export function createElement(Cls, attributes, ...children){
     // console.log(arguments)
@@ -63,6 +64,15 @@ export class Wrapper{
 
     setAttribute(name, value){ // attribute
         this.root.setAttribute(name, value)
+        
+        if(name.match(/^on([\s\S]+)$/)){
+            let eventName = RegExp.$1.replace(/^[/s/S]/, c=>c.toLowerCase());
+            this.addEventListener(eventName, value)
+        }
+
+        if(name === "enableGesture") {
+            enableGesture(this.root)
+        }
     }
 
     appendChild(child){ // children

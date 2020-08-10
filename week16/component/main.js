@@ -1,113 +1,109 @@
-import {createElement, Text, Wrapper} from "./createElement";
-// import {Carousel} from "./carousel.view";
+import {Carousel} from "./carousel.js";
 
-import {Timeline, Animation} from "./animation.js"
-import {ease, linear} from "./cubicBezier.js"
+// class MyComponent{
+//     constructor(config){
+//         // console.log(config)
+//         this.children = [];
+//         // this.root = document.createElement('div');
+//     }
 
-class MyComponent{
-    constructor(config){
-        // console.log(config)
-        this.children = [];
-        // this.root = document.createElement('div');
-    }
+//     setAttribute(name, value){ // attribute
+//         this.root.setAttribute(name, value)
+//     }
 
-    setAttribute(name, value){ // attribute
-        this.root.setAttribute(name, value)
-    }
+//     appendChild(child){ // children
+//         this.children.push(child)
+//     }
+//     set title (child){
+//         this.properties.set('title', value)
+//     }
 
-    appendChild(child){ // children
-        this.children.push(child)
-    }
-    set title (child){
-        this.properties.set('title', value)
-    }
+//     render(){
+//         return <article>
+//             <h2>{this.properties.get('title')}</h2>
+//             <header>header</header>
+//             {this.slot}
+//             <footer>footer</footer>
+//         </article>
+//     }
 
-    render(){
-        return <article>
-            <h2>{this.properties.get('title')}</h2>
-            <header>header</header>
-            {this.slot}
-            <footer>footer</footer>
-        </article>
-    }
-
-    mountTo(parent){
-        this.slot = <div></div>
-        for(let child of this.children){
-            debugger
-            // child.mountTo(this.root)
-            this.slot.appendChild(child)
-        }
-        console.log(this.render())
-        this.render().mountTo(parent)
-        // parent.appendChild(this.root);
-        // console.log(this.children)
+//     mountTo(parent){
+//         this.slot = <div></div>
+//         for(let child of this.children){
+//             debugger
+//             // child.mountTo(this.root)
+//             this.slot.appendChild(child)
+//         }
+//         console.log(this.render())
+//         this.render().mountTo(parent)
+//         // parent.appendChild(this.root);
+//         // console.log(this.children)
         
-    }
-}
+//     }
+// }
 
-class Carousel {
-    constructor(config){
-        // console.log(config)
-        this.children = [];
-        this.attributes = new Map()
-        this.properies = new Map()
-    }
+// class Carousel {
+//     constructor(config){
+//         // console.log(config)
+//         this.children = [];
+//         this.attributes = new Map()
+//         this.properies = new Map()
+//     }
 
-    setAttribute(name, value){ // attribute
-        this[name] = value
-    }
+//     setAttribute(name, value){ // attribute
+//         this[name] = value
+//     }
 
-    appendChild(child){ // children
-        this.children.push(child)
-    }
+//     appendChild(child){ // children
+//         this.children.push(child)
+//     }
 
-    render(){
-        let children = this.data.map(url => {
-            let element = <img src={url} />
-            element.addEventListener("dragstart", event => event.preventDefault())
-            return element;
-        })
-        let root = <div class="carousel">
-                        { children }
-                    </div>
+//     render(){
+//         let children = this.data.map(url => {
+//             let element = <img src={url} />
+//             element.addEventListener("dragstart", event => event.preventDefault())
+//             return element;
+//         })
+//         let root = <div class="carousel">
+//                         { children }
+//                     </div>
 
-        let position = 0;
-        let timeline = new Timeline;
-        let nextpic = () => {
-            // 先计算出下一张的位置
-            let nextPosition = (position + 1) % this.data.length;
+//         let position = 0;
+//         let timeline = new Timeline;
+//         let nextpic = () => {
+//             // 先计算出下一张的位置
+//             let nextPosition = (position + 1) % this.data.length;
             
-            // 一次移动两张
-            let current = children[position];
-            let next = children[nextPosition];
+//             // 一次移动两张
+//             let current = children[position];
+//             let next = children[nextPosition];
           
-            let currentAnimation = new Animation(current.style, "transition", -100 * position, -100-100*position, 500, 0, ease, v => `translateX(${v}%)`);
-            let nextAnimation = new Animation(next.style, "transition", 100 - 100 * nextPosition, -100*nextPosition, 500, 0, ease, v => `translateX(${v}%)`);
+//             let currentAnimation = new Animation(current.style, "transition", -100 * position, -100-100*position, 500, 0, ease, v => `translateX(${v}%)`);
+//             let nextAnimation = new Animation(next.style, "transition", 100 - 100 * nextPosition, -100*nextPosition, 500, 0, ease, v => `translateX(${v}%)`);
 
-            timeline.add(currentAnimation)
-            timeline.add(nextAnimation)
+//             timeline.add(currentAnimation)
+//             timeline.add(nextAnimation)
 
-            timeline.start()
+//             timeline.start()
 
-            // transition生效需要时间，所以需要加个setTimeout时间间隔
-            position = nextPosition
+//             // transition生效需要时间，所以需要加个setTimeout时间间隔
+//             position = nextPosition
             
-            // 循环
-            setTimeout(nextpic, 2000)
-        }
+//             // 循环
+//             setTimeout(nextpic, 2000)
+//         }
 
-        // nextpic(); // 第一张没有了显示时间
-        // 第一张显示2秒
-        setTimeout(nextpic, 2000)
+//         // nextpic(); // 第一张没有了显示时间
+//         // 第一张显示2秒
+//         setTimeout(nextpic, 2000)
         
-        return root;
-    }
+//         return root;
+//     }
 
-    mountTo(parent){
-        this.render().mountTo(parent)
-    }
-}
+//     mountTo(parent){
+//         this.render().mountTo(parent)
+//     }
+// }
 
 
 // let component = <div id="a" cls="b" style="width:100px;height:100px;background-color:lightgreen">
@@ -132,7 +128,7 @@ class Carousel {
 //     <div>text text text </div>
 // </MyComponent>
 
-// console.log(Carousel)
+console.log(Carousel)
 let component = <Carousel data={
     [
         "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",

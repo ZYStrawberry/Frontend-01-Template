@@ -66,13 +66,18 @@ export class Wrapper{
         this.root.setAttribute(name, value)
         
         if(name.match(/^on([\s\S]+)$/)){
-            let eventName = RegExp.$1.replace(/^[/s/S]/, c=>c.toLowerCase());
+            let eventName = RegExp.$1.replace(/^[\s\S]/, c=>c.toLowerCase());
             this.addEventListener(eventName, value)
         }
 
         if(name === "enableGesture") {
             enableGesture(this.root)
         }
+    }
+
+    // add for tabPanel to get title
+    getAttribute(name){
+        return this.root.getAttribute(name)
     }
 
     appendChild(child){ // children
@@ -85,6 +90,14 @@ export class Wrapper{
 
     get style() {
         return this.root.style;
+    }
+
+    get classList() {
+        return this.root.classList;
+    }
+
+    set innerText(text){
+        return this.root.innerText = text;
     }
 
     mountTo(parent){

@@ -3,6 +3,12 @@ import {Timeline, Animation} from "./animation.js"
 import {ease, linear} from "./cubicBezier.js"
 import {enableGesture} from "./gesture.js"
 
+import css from "./carousel.css"
+
+// console.log(css)
+// let style = document.createElement("style");
+// style.innerHTML = css[0][1];
+// document.documentElement.appendChild(style);
 
 export class Carousel {
     constructor(config){
@@ -28,11 +34,10 @@ export class Carousel {
         let position = 0;
 
         let nextPicStopHandler = null;
-
         let children = this.data.map((url, currentPosition) =>{
+       
             let lastPosition = (currentPosition - 1 + this.data.length) % this.data.length;
             let nextPosition = (currentPosition + 1 ) % this.data.length;
-
             let offset= 0;
 
             let onStart = ()=>{
@@ -67,13 +72,16 @@ export class Carousel {
             }   
 
             let onPanend = event => {
+                console.log(event)
                 console.log("进来panend")
                 let direction = 0;
                 let dx = event.clientX - event.startX;
 
-                if(dx + offset > 250) {
+                console.log("flick", event.isFlick)
+
+                if(dx + offset > 250 || dx > 0 && event.isFlick) {
                     direction = 1;
-                } else if(dx + offset < -250) {
+                } else if(dx + offset < -250 || dx < 0 && event.isFlick) {
                     direction = -1;
                 }
                 console.log("direction",direction)
@@ -87,32 +95,30 @@ export class Carousel {
                 let nextElement = children[nextPosition];
 
                 let lastAnimation = new Animation(lastElement.style, "transform", -500 - 500 * lastPosition + offset + dx, -500-500*lastPosition + direction * 500, 500, 0, ease, v => `translateX(${v}px)`);
-                let currentAnimation = new Animation(currentElement.style, "transform", -500 * currentPosition + offset + dx, -500-500*currentPosition+ direction * 500, 500, 0, ease, v => `translateX(${v}px)`);
-                let nextAnimation = new Animation(nextElement.style, "transform", 500 - 500 * nextPosition + offset + dx, -500*nextPosition+ direction * 500, 500, 0, ease, v => `translateX(${v}px)`);
+                let currentAnimation = new Animation(currentElement.style, "transform", -500 * currentPosition + offset + dx, -500*currentPosition+ direction * 500, 500, 0, ease, v => `translateX(${v}px)`);
+                let nextAnimation = new Animation(nextElement.style, "transform", 500 - 500 * nextPosition + offset + dx, 500-500*nextPosition+ direction * 500, 500, 0, ease, v => `translateX(${v}px)`);
                 
                 timeline.add(lastAnimation)
                 timeline.add(currentAnimation)
                 timeline.add(nextAnimation)
 
                 position = (position - direction + this.data.length) % this.data.length;
-                nextPicStopHandler = setTimeout(nextPic, 3000)
+                nextPicStopHandler = setTimeout(nextpic, 3000)
                 
             }
 
-            let element  = <img src={url}  onStart={onStart} onPan={onPan} onPanend={onPanend} enableGesture={true} />
+            let element  = <img src={url}  onstart={onStart} onpan={onPan} onpanend={onPanend} enableGesture={true} />
             element.style.transform = "translateX(0px)";
             element.addEventListener("dragstart", event => event.preventDefault());
 
             console.log("element",element)
-
-
             return element;
         })
 
         let nextpic = () => {
             // 先计算出下一张的位置
             let nextPosition = (position + 1) % this.data.length;
-            // console.log(nextPosition)
+            console.log("nextpic::nextPosition",nextPosition)
             // 一次移动两张
             let current = children[position];
             let next = children[nextPosition];
@@ -133,7 +139,7 @@ export class Carousel {
         // nextpic(); // 第一张没有了显示时间
         // 第一张显示2秒
         nextPicStopHandler = setTimeout(nextpic, 2000)
-        
+        console.log(children)
         return <div class="carousel">
             {children}
         </div>;

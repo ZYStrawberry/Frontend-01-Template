@@ -10,7 +10,7 @@ export class Timeline{
 
         this.tick = ()=>{
             let t = Date.now() - this.startTime;
-            console.log(t)
+            // console.log(t)
             
             // 对结束的动画进行管理
             // let animations = this.animations.filter(animation => !animation.finished)
@@ -100,8 +100,8 @@ export class Timeline{
     reset() {
         if(this.state === "playing")
             this.pause()
-        this.animations = new set();
-        this.finishedAnimations = new set();
+        this.animations = new Set();
+        this.finishedAnimations = new Set();
         this.addTimes = new Map();
         this.requestID = null;
         this.startTime = Date.now();

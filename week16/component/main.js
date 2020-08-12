@@ -1,7 +1,7 @@
 
 import {createElement, Text, Wrapper} from "./createElement";
 import {Carousel} from "./carousel.js";
-// console.log(Carousel)
+
 let component = <Carousel data={
     [
         "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",

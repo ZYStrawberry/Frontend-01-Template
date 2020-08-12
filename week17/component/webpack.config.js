@@ -18,6 +18,18 @@ module.exports = {
                 use:{
                     loader: require.resolve("./myloader.js")
                 }
+            },
+            // {
+            //     test: /\.css$/,
+            //     use:{
+            //         loader: 'css-loader'
+            //     }
+            // }
+            {
+                test: /\.css$/,
+                use:{
+                    loader: require.resolve("./cssloader.js")
+                }
             }
         ]
     },

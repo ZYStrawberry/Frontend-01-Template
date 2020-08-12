@@ -66,7 +66,7 @@ export class Wrapper{
         this.root.setAttribute(name, value)
         
         if(name.match(/^on([\s\S]+)$/)){
-            let eventName = RegExp.$1.replace(/^[/s/S]/, c=>c.toLowerCase());
+            let eventName = RegExp.$1.replace(/^[\s\S]/, c=>c.toLowerCase());
             this.addEventListener(eventName, value)
         }
 

@@ -57,7 +57,7 @@ export function enableGesture(element) {
 
 
     let start = (point, context) => {
-        element.dispatchEvent(new CustomEvent('start', {
+        element.dispatchEvent(Object.assign(new CustomEvent('start'), {
             startX:point.clientX,
             startY:point.clientY,
             clientX:point.clientX,
@@ -84,7 +84,7 @@ export function enableGesture(element) {
             context.isTap = false;
             context.isPan = false;
             context.isPress = true;
-            element.dispatchEvent(new CustomEvent('pressstart', {}))
+            element.dispatchEvent(Object.assign(new CustomEvent('pressstart'), {}))
         },500)
     }
 
@@ -97,7 +97,7 @@ export function enableGesture(element) {
         if (dx ** 2 + dy ** 2 > 100 && !context.isPan) {
             
             if(context.isPress)
-                element.dispatchEvent(new CustomEvent('presscancel', {}))
+                element.dispatchEvent(Object.assign(new CustomEvent('presscancel'), {}))
             
             context.isTap = false;
             context.isPan = true;
@@ -109,12 +109,6 @@ export function enableGesture(element) {
                 clientX:point.clientX,
                 clientY:point.clientY
             }))
-            // element.dispatchEvent(new CustomEvent('panstart', {
-            //     startX:context.startX,
-            //     startY:context.startY,
-            //     clientX:point.clientX,
-            //     clientY:point.clientY
-            // }))
         }
 
         
@@ -152,13 +146,6 @@ export function enableGesture(element) {
             let isFlick = speed > 3
             // 速度大于3的算flick事件
             // if(isFlick) {
-            //     // element.dispatchEvent(new CustomEvent('flick', {
-            //     //     startX:context.startX,
-            //     //     startY:context.startY,
-            //     //     clientX:point.clientX,
-            //     //     clientY:point.clientY,
-            //     //     speed: speed
-            //     // }))
             //     element.dispatchEvent(Object.assign(new CustomEvent('flick'), {
             //         startX:context.startX,
             //         startY:context.startY,

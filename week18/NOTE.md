@@ -25,6 +25,10 @@ npm install --save-dev @babel/core @babel/cli @babel/preset-env
 
 创建文件夹babel,创建文件demo.js
 
+vue-next:https://github.com/vuejs/vue-next/tree/master/packages/compiler-sfc/__tests__
+
+https://github.com/vuejs/vue-next/blob/master/packages/compiler-sfc/__tests__/compileTemplate.spec.ts
+
 
 #### 2、npm的使用
 

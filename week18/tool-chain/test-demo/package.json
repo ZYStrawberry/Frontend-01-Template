@@ -3,12 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
     "test": "mocha",
-    "coverage": "nyc npm run test"
+    "coverage": "nyc mocha"
   },
   "author": "",
   "license": "ISC",
@@ -17,10 +14,26 @@
     "@babel/cli": "^7.10.5",
     "@babel/core": "^7.11.1",
     "@babel/preset-env": "^7.11.0",
+    "ava": "^3.11.1",
+    "babel-loader": "^8.1.0",
     "mocha": "^8.1.1",
-    "webpack": "^4.44.1"
+    "webpack": "^4.44.1",
+    "@babel/register": "^7.10.5"
   },
   "dependencies": {
     "nyc": "^15.1.0"
+  },
+  "ava": {
+    "files": [
+      "test/*.js"
+    ],
+    "require": [
+      "@babel/register"
+    ],
+    "babel": {
+      "testOptions": {
+        "babelrc": true
+      }
+    }
   }
 }

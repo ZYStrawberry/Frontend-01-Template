@@ -23,7 +23,7 @@ function addCSSRules(text){
                
 }
 
-
+// 计算优先级
 function specificity(selector){
     var p = [0,0,0,0];
     var selectorParts = selector.split(" ");
@@ -76,7 +76,7 @@ function computeCSS(element){
         }
         if(matchd){
             var sp = specificity(rule.selectors[0]);
-            console.log(sp)
+            // console.log(sp)
             var computedStyle = element.computedStyle;
             for(var declaration of rule.declarations){
                 if(!computedStyle[declaration.property])
@@ -98,7 +98,7 @@ function emit(token){
     let top = stack[stack.length-1];  // 栈顶
 
     if(token.type == "startTag"){
-        console.log("startTag",  token)
+        // console.log("startTag",  token)
         let element = {
             type:'element',
             children:[],
@@ -139,7 +139,7 @@ function emit(token){
             stack.pop()
         }
 
-        console.log(top)
+        // console.log(top)
         layout(top)
         
 
@@ -288,7 +288,7 @@ function doubleQuotedAttributeValue(c){
         return 
     } else{
         currentAttribute.value += c;
-        console.log(currentAttribute.value )
+        // console.log(currentAttribute.value )
         return doubleQuotedAttributeValue
     }
 }
@@ -345,7 +345,7 @@ function afterQuotedAttributeValue(c){
         return selfClosingStartTag;
     } else if(c == ">"){
         currentToken[currentAttribute.name] = currentAttribute.value;
-        console.log(currentAttribute)
+        // console.log(currentAttribute)
         emit(currentToken)
         return data;
     } else if(c == EOF){

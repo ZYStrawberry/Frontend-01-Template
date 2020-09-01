@@ -103,6 +103,7 @@ class Carousel {
                 console.log(position)
                 position = nextPosition
             },16);// 浏览器 一帧16ms
+<<<<<<< HEAD
 
             // requestAnimationFrame要使用两次
 
@@ -123,6 +124,8 @@ class Carousel {
             //     })
             // })
            
+=======
+>>>>>>> 73c0067c17bf3b0ca1f40281dfefe7f478f3f47c
             
             // 循环
             setTimeout(nextpic, 2000)
@@ -130,7 +133,11 @@ class Carousel {
 
         // nextpic(); // 第一张没有了显示时间
         // 第一张显示2秒
+<<<<<<< HEAD
         // setTimeout(nextpic, 2000)
+=======
+        setTimeout(nextpic, 2000)
+>>>>>>> 73c0067c17bf3b0ca1f40281dfefe7f478f3f47c
         
         return root;
     }
